@@ -91,9 +91,9 @@ export const testimonials = [
 ]
 
 export const resources = [
-  ['Choosing the Right Van Size', 'How to match your move size to the right vehicle and avoid extra trips.'],
-  ['Packing for a Safer Move', 'Simple packing steps to protect fragile items, furniture, and boxes.'],
-  ['Moving Day Preparation', 'What to arrange before the crew arrives so the day runs smoothly.'],
+  ['truck', 'Choosing the Right Van Size', 'How to match your move size to the right vehicle and avoid extra trips.'],
+  ['box', 'Packing for a Safer Move', 'Simple packing steps to protect fragile items, furniture, and boxes.'],
+  ['clipboard', 'Moving Day Preparation', 'What to arrange before the crew arrives so the day runs smoothly.'],
 ]
 
 export const faqs = [

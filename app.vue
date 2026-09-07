@@ -241,10 +241,18 @@ const activeAdminView = computed(() => {
         <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Guides</p>
         <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Helpful moving resources.</h2>
         <div class="mt-10 grid gap-5 md:grid-cols-3">
-          <article v-for="[title, copy] in resources" :key="title" class="bg-white p-6 shadow-sm">
-            <div class="mb-6 h-36 bg-gradient-to-br from-orange-100 to-white" />
+          <article v-for="[icon, title, copy] in resources" :key="title" class="bg-white p-6 shadow-sm">
+            <div class="mb-6 flex items-center justify-between border-b border-dach-line pb-6">
+              <span class="flex h-12 w-12 items-center justify-center bg-dach-orange text-white">
+                <FontAwesomeIcon :icon="icon" />
+              </span>
+              <span class="text-sm font-semibold uppercase tracking-[0.16em] text-dach-muted">Guide</span>
+            </div>
             <h3 class="text-xl font-bold">{{ title }}</h3>
             <p class="mt-3 leading-7 text-dach-muted">{{ copy }}</p>
+            <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">
+              Get advice <FontAwesomeIcon icon="arrow-right" />
+            </a>
           </article>
         </div>
       </div>
