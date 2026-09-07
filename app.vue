@@ -491,11 +491,11 @@ async function loginAdmin() {
           </span>
           <span>{{ item.label }}</span>
           <span
-            v-if="item.badge !== undefined"
+            v-if="(item.label === 'Quote Requests' && quotes.length > 0) || (item.label === 'Messages' && unreadMessages.length > 0)"
             class="ml-auto rounded-full px-2.5 py-1 text-xs font-bold"
             :class="route.path === item.path ? 'bg-white text-dach-orange' : 'bg-dach-orange text-white'"
           >
-            {{ item.label === 'Quote Requests' ? quotes.length : item.label === 'Messages' ? unreadMessages.length : item.badge }}
+            {{ item.label === 'Quote Requests' ? quotes.length : unreadMessages.length }}
           </span>
         </NuxtLink>
       </nav>
