@@ -121,8 +121,7 @@ const activeAdminView = computed(() => {
     </section>
 
     <section id="how-it-works" class="section-wrap py-24">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Fast quote process</p>
-      <div class="mt-4 grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end">
+      <div class="grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end">
         <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Get a clear removals quote without the back and forth.</h2>
         <p class="text-lg leading-8 text-dach-muted">The quote flow keeps the important details simple: locations, move type, date, access, and the level of help required.</p>
       </div>
@@ -145,8 +144,7 @@ const activeAdminView = computed(() => {
 
     <section id="services" class="border-y border-dach-line bg-dach-cream py-24">
       <div class="section-wrap">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Services</p>
-        <div class="mt-4 grid gap-6 lg:grid-cols-[0.7fr_1fr] lg:items-end">
+        <div class="grid gap-6 lg:grid-cols-[0.7fr_1fr] lg:items-end">
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Removal services for every type of move.</h2>
           <p class="text-lg leading-8 text-dach-muted">From one item to a full home, Dach Removals gives you the right crew, vehicle, and support for the job.</p>
         </div>
@@ -181,8 +179,7 @@ const activeAdminView = computed(() => {
     </section>
 
     <section class="section-wrap py-24">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Why choose Dach</p>
-      <div class="mt-4 grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+      <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
         <div>
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Reliable movers, clear communication, prepared crews.</h2>
           <p class="mt-5 leading-8 text-dach-muted">A professional removals page should make the offer obvious. This one focuses on practical proof, direct contact, and simple booking actions.</p>
@@ -200,8 +197,7 @@ const activeAdminView = computed(() => {
     <section id="areas" class="border-y border-dach-line bg-gray-50 py-24">
       <div class="section-wrap grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
         <div>
-          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">UK coverage</p>
-          <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Areas we cover across the UK.</h2>
+          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover across the UK.</h2>
           <p class="mt-5 leading-8 text-dach-muted">Dach Removals supports local and long-distance moves across major UK regions.</p>
           <div class="mt-8 flex flex-wrap gap-3">
             <span v-for="routePair in routePairs" :key="routePair" class="bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
@@ -221,8 +217,7 @@ const activeAdminView = computed(() => {
     <section id="reviews" class="section-wrap py-24">
       <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Reviews</p>
-          <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">What customers say.</h2>
+          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">What customers say.</h2>
         </div>
         <p class="text-dach-muted"><FontAwesomeIcon icon="star" class="text-dach-orange" /> 4.8/5 from 2,500+ reviews</p>
       </div>
@@ -238,8 +233,7 @@ const activeAdminView = computed(() => {
 
     <section class="bg-dach-cream py-24">
       <div class="section-wrap">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Guides</p>
-        <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Helpful moving resources.</h2>
+        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Helpful moving resources.</h2>
         <div class="mt-10 grid gap-5 md:grid-cols-3">
           <article v-for="[icon, title, copy] in resources" :key="title" class="bg-white p-6 shadow-sm">
             <div class="mb-6 flex items-center justify-between border-b border-dach-line pb-6">
@@ -260,8 +254,7 @@ const activeAdminView = computed(() => {
 
     <section id="faq" class="section-wrap grid gap-10 py-24 lg:grid-cols-[0.7fr_1.3fr]">
       <div>
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">FAQ</p>
-        <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Frequently asked questions.</h2>
+        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Frequently asked questions.</h2>
         <p class="mt-5 leading-8 text-dach-muted">Answers to the common questions people ask before booking a removals crew.</p>
         <p class="mt-8 font-semibold">Need help? <a :href="`mailto:${brand.email}`" class="text-dach-orange">{{ brand.email }}</a></p>
       </div>
@@ -281,8 +274,7 @@ const activeAdminView = computed(() => {
     <section class="bg-dach-black py-20 text-white">
       <div class="section-wrap grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-dach-orange">Get started</p>
-          <h2 class="mt-4 text-4xl font-bold tracking-tight md:text-5xl">Ready to plan your move?</h2>
+          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Ready to plan your move?</h2>
           <p class="mt-4 max-w-2xl leading-8 text-white/70">Send the details once. We will come back with clear pricing, availability, and the best crew for the job.</p>
         </div>
         <div class="flex flex-wrap gap-3">
