@@ -517,7 +517,7 @@ async function loginAdmin() {
           </div>
           <div class="flex items-center gap-4">
             <button class="border border-dach-line bg-white px-4 py-3 text-sm font-semibold text-dach-muted" type="button" @click="loadAdminData">
-              <FontAwesomeIcon icon="bolt" class="mr-2 text-dach-orange" />Refresh
+              <FontAwesomeIcon icon="rotate-right" class="mr-2 text-dach-orange" />Refresh
             </button>
             <p class="text-sm text-dach-muted">Mon, 7 September 2026 <span class="ml-3 font-semibold text-green-600">Live</span></p>
           </div>
