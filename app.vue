@@ -24,8 +24,8 @@ const quoteForm = reactive({
 })
 const heroSlides = [
   { title: 'House removals', image: '/images/hero-removals.png', position: 'object-center' },
-  { title: 'Man and van', image: '/images/hero-removals.png', position: 'object-left' },
-  { title: 'Same-day moves', image: '/images/hero-removals.png', position: 'object-right' },
+  { title: 'Man and van', image: '/images/hero-removals-2.png', position: 'object-center' },
+  { title: 'Same-day moves', image: '/images/hero-removals-3.png', position: 'object-center' },
 ]
 const fallbackContentSections: ContentSection[] = [
   {
@@ -322,41 +322,41 @@ async function loginAdmin() {
         <Motion
           id="quote"
           as="form"
-          class="relative z-10 border border-white/50 bg-white/95 p-7 text-dach-black shadow-2xl shadow-black/35 backdrop-blur"
+          class="relative z-10 border border-white/25 bg-dach-black/35 p-7 text-white shadow-2xl shadow-black/35 backdrop-blur-md"
           :initial="{ opacity: 0, y: 26 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
           @submit.prevent="submitQuote"
         >
           <h2 class="text-2xl font-bold tracking-tight">Get Your Price</h2>
-          <p class="mt-2 text-sm text-dach-muted">Enter your details. We confirm the rest.</p>
+          <p class="mt-2 text-sm text-white/75">Enter your details. We confirm the rest.</p>
 
           <label class="mt-6 block text-sm font-semibold">Moving From</label>
-          <div class="mt-2 flex items-center gap-3 bg-dach-cream px-4 py-4 text-dach-muted">
+          <div class="mt-2 flex items-center gap-3 border border-white/15 bg-white/15 px-4 py-4 text-white/75">
             <FontAwesomeIcon icon="location-dot" />
-            <input v-model="quoteForm.pickupPostcode" class="w-full bg-transparent outline-none" placeholder="Enter postcode" />
+            <input v-model="quoteForm.pickupPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Enter postcode" />
           </div>
 
           <label class="mt-4 block text-sm font-semibold">Moving To</label>
-          <div class="mt-2 flex items-center gap-3 bg-dach-cream px-4 py-4 text-dach-muted">
+          <div class="mt-2 flex items-center gap-3 border border-white/15 bg-white/15 px-4 py-4 text-white/75">
             <FontAwesomeIcon icon="route" />
-            <input v-model="quoteForm.deliveryPostcode" class="w-full bg-transparent outline-none" placeholder="Enter postcode" />
+            <input v-model="quoteForm.deliveryPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Enter postcode" />
           </div>
 
           <div class="mt-4 grid gap-3 md:grid-cols-2">
-            <select v-model="quoteForm.serviceType" class="bg-dach-cream px-4 py-4 text-dach-muted outline-none">
+            <select v-model="quoteForm.serviceType" class="border border-white/15 bg-white/15 px-4 py-4 text-white outline-none">
               <option>House Move</option>
               <option>Man and Van</option>
               <option>Office Relocation</option>
               <option>Packing and Storage</option>
             </select>
-            <input v-model="quoteForm.preferredDate" class="bg-dach-cream px-4 py-4 text-dach-muted outline-none" placeholder="dd/mm/yyyy" />
+            <input v-model="quoteForm.preferredDate" class="border border-white/15 bg-white/15 px-4 py-4 text-white outline-none placeholder:text-white/55" placeholder="dd/mm/yyyy" />
           </div>
 
           <button class="mt-6 w-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-dach-black">
             See Price Instantly <FontAwesomeIcon icon="arrow-right" class="ml-2" />
           </button>
-          <p class="mt-4 text-center text-sm text-dach-muted"><FontAwesomeIcon icon="lock" class="mr-1" /> Secure enquiry. Rated 4.8/5.</p>
+          <p class="mt-4 text-center text-sm text-white/75"><FontAwesomeIcon icon="lock" class="mr-1" /> Secure enquiry. Rated 4.8/5.</p>
         </Motion>
       </div>
     </section>
