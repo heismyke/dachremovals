@@ -234,21 +234,22 @@ async function loginAdmin() {
       </div>
     </header>
 
-    <section class="relative overflow-hidden bg-dach-black text-white">
+    <section class="relative isolate overflow-hidden bg-dach-black text-white">
       <img
         v-for="(slide, index) in heroSlides"
         :key="slide.title"
         :src="slide.image"
         :alt="slide.title"
-        class="absolute inset-0 h-full w-full object-cover transition duration-1000"
-        :class="[slide.position, currentHeroSlide === index ? 'scale-100 opacity-45' : 'scale-105 opacity-0']"
+        class="absolute inset-0 -z-20 h-full w-full object-cover transition duration-1000"
+        :class="[slide.position, currentHeroSlide === index ? 'scale-100 opacity-100' : 'scale-105 opacity-0']"
       />
-      <div class="absolute inset-0 bg-gradient-to-r from-dach-black via-dach-black/82 to-dach-black/35" />
-      <div class="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-dach-black/45 to-transparent" />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-r from-dach-black/88 via-dach-black/58 to-dach-black/18" />
+      <div class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-dach-black/60 to-transparent" />
 
-      <div class="section-wrap relative grid min-h-[660px] items-center gap-12 py-16 lg:grid-cols-[1fr_430px]">
+      <div class="section-wrap relative grid min-h-[700px] items-center gap-12 py-20 lg:grid-cols-[0.92fr_430px]">
         <Motion
           as="div"
+          class="max-w-2xl"
           :initial="{ opacity: 0, y: 24 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut' }"
@@ -284,7 +285,7 @@ async function loginAdmin() {
         <Motion
           id="quote"
           as="form"
-          class="border border-white/10 bg-white p-6 text-dach-black shadow-2xl shadow-black/30"
+          class="relative z-10 border border-white/50 bg-white/95 p-7 text-dach-black shadow-2xl shadow-black/35 backdrop-blur"
           :initial="{ opacity: 0, y: 26 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
