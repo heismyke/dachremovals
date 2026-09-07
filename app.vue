@@ -33,18 +33,18 @@ const activeAdminView = computed(() => {
           </span>
         </a>
 
-        <nav class="font-sf-mono hidden items-center gap-8 text-sm font-semibold lg:flex">
+        <nav class="hidden items-center gap-8 text-sm font-semibold lg:flex">
           <a v-for="item in navigation" :key="item.href" :href="item.href" class="transition hover:text-dach-orange">
             {{ item.label }}
           </a>
         </nav>
 
         <div class="flex items-center gap-3">
-          <a :href="`tel:${brand.phone}`" class="font-sf-mono hidden items-center gap-3 bg-dach-cream px-5 py-3 text-sm font-semibold md:flex">
+          <a :href="`tel:${brand.phone}`" class="hidden items-center gap-3 bg-dach-cream px-5 py-3 text-sm font-semibold md:flex">
             <FontAwesomeIcon icon="phone" />
             {{ brand.phone }}
           </a>
-          <a href="/admin" class="font-sf-mono bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black">Log In</a>
+          <a href="/admin" class="bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black">Log In</a>
         </div>
       </div>
     </header>
@@ -60,14 +60,14 @@ const activeAdminView = computed(() => {
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut' }"
         >
-          <div class="font-sf-mono mb-8 flex flex-wrap gap-3">
+          <div class="mb-8 flex flex-wrap gap-3">
             <span v-for="badge in trustBadges" :key="badge" class="bg-white/12 px-4 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
           </div>
           <h1 class="max-w-3xl text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
             UK removals, <span class="text-dach-orange">made simple.</span>
           </h1>
           <p class="mt-6 max-w-xl text-lg leading-8 text-white/82">Fast quotes. Careful movers. Clear pricing.</p>
-          <div class="font-sf-mono mt-9 flex flex-wrap gap-4">
+          <div class="mt-9 flex flex-wrap gap-4">
             <a href="#quote" class="bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               Get a Quote <FontAwesomeIcon icon="arrow-right" class="ml-2" />
             </a>
@@ -110,7 +110,7 @@ const activeAdminView = computed(() => {
             <input class="bg-dach-cream px-4 py-4 text-dach-muted outline-none" placeholder="dd/mm/yyyy" />
           </div>
 
-          <button class="font-sf-mono mt-6 w-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-dach-black">
+          <button class="mt-6 w-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-dach-black">
             See Price Instantly <FontAwesomeIcon icon="arrow-right" class="ml-2" />
           </button>
           <p class="mt-4 text-center text-sm text-dach-muted"><FontAwesomeIcon icon="lock" class="mr-1" /> Secure enquiry. Rated 4.8/5.</p>
@@ -133,7 +133,7 @@ const activeAdminView = computed(() => {
           :transition="{ duration: 0.2, ease: 'easeOut' }"
         >
           <span class="mb-7 flex h-11 w-11 items-center justify-center bg-dach-orange text-white"><FontAwesomeIcon :icon="step.icon" /></span>
-          <span class="font-sf-mono text-sm font-semibold text-dach-muted">0{{ index + 1 }}</span>
+          <span class="text-sm font-semibold text-dach-muted">0{{ index + 1 }}</span>
           <h3 class="mt-3 text-lg font-bold">{{ step.title }}</h3>
           <p class="mt-3 text-sm leading-6 text-dach-muted">{{ step.copy }}</p>
         </Motion>
@@ -157,8 +157,8 @@ const activeAdminView = computed(() => {
                 <li v-for="item in service.idealFor" :key="item"><FontAwesomeIcon icon="check" class="mr-2 text-dach-orange" />{{ item }}</li>
               </ul>
               <div class="mt-6 flex gap-3">
-                <a href="#quote" class="font-sf-mono bg-dach-orange px-5 py-3 font-semibold text-white">Get Quote</a>
-                <a href="#faq" class="font-sf-mono border border-dach-line px-5 py-3 font-semibold">Learn More</a>
+                <a href="#quote" class="bg-dach-orange px-5 py-3 font-semibold text-white">Get Quote</a>
+                <a href="#faq" class="border border-dach-line px-5 py-3 font-semibold">Learn More</a>
               </div>
             </div>
           </article>
@@ -169,7 +169,7 @@ const activeAdminView = computed(() => {
             <span class="mb-6 flex h-11 w-11 items-center justify-center bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
             <h3 class="text-xl font-bold">{{ service.title }}</h3>
             <p class="mt-3 leading-7 text-dach-muted">{{ service.description }}</p>
-            <a href="#quote" class="font-sf-mono mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
+            <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
           </article>
         </div>
       </div>
@@ -181,7 +181,7 @@ const activeAdminView = computed(() => {
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover.</h2>
           <p class="mt-5 leading-8 text-dach-muted">Local and long-distance removals across the UK.</p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <span v-for="routePair in routePairs" :key="routePair" class="font-sf-mono bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
+            <span v-for="routePair in routePairs" :key="routePair" class="bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
           </div>
         </div>
         <div class="grid gap-5 md:grid-cols-2">
@@ -203,7 +203,7 @@ const activeAdminView = computed(() => {
       </div>
       <div class="space-y-3">
         <article v-for="(faq, index) in faqs" :key="faq" class="border border-dach-line">
-          <button class="font-sf-mono flex w-full items-center justify-between p-5 text-left font-semibold" @click="openFaq = openFaq === index ? -1 : index">
+          <button class="flex w-full items-center justify-between p-5 text-left font-semibold" @click="openFaq = openFaq === index ? -1 : index">
             {{ faq }}
             <FontAwesomeIcon :icon="openFaq === index ? 'chevron-down' : 'arrow-right'" class="text-dach-orange" />
           </button>
@@ -221,8 +221,8 @@ const activeAdminView = computed(() => {
           <p class="mt-4 max-w-2xl leading-8 text-white/70">Get a quote or call the team.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <a href="#quote" class="font-sf-mono bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
-          <a :href="`tel:${brand.phone}`" class="font-sf-mono border border-white/20 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
+          <a href="#quote" class="bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
+          <a :href="`tel:${brand.phone}`" class="border border-white/20 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
         </div>
       </div>
     </section>
@@ -243,18 +243,18 @@ const activeAdminView = computed(() => {
           <p class="text-white/60">UK removals. Clear pricing. Careful crews.</p>
         </div>
         <div>
-          <h3 class="font-sf-mono font-semibold">Services</h3>
+          <h3 class="font-semibold">Services</h3>
           <p v-for="service in services.slice(0, 5)" :key="service.title" class="mt-3 text-white/55">{{ service.title }}</p>
         </div>
         <div>
-          <h3 class="font-sf-mono font-semibold">Company</h3>
+          <h3 class="font-semibold">Company</h3>
           <p class="mt-3 text-white/55">About Us</p>
           <p class="mt-3 text-white/55">Reviews</p>
           <p class="mt-3 text-white/55">Get a Quote</p>
           <p class="mt-3 text-white/55">Help Centre</p>
         </div>
         <div>
-          <h3 class="font-sf-mono font-semibold">Contact</h3>
+          <h3 class="font-semibold">Contact</h3>
           <p class="mt-3 text-white/55">{{ brand.phone }}</p>
           <p class="mt-3 text-white/55">{{ brand.email }}</p>
           <p class="mt-8 text-white/35">© 2026 Dach Removals.</p>
