@@ -262,11 +262,11 @@ async function loginAdmin() {
         </nav>
 
         <div class="flex items-center gap-3">
-          <a :href="`tel:${brand.phone}`" class="hidden items-center gap-3 bg-dach-cream px-5 py-3 text-sm font-semibold md:flex">
+          <a :href="`tel:${brand.phone}`" class="hidden items-center gap-3 rounded-full bg-dach-cream px-5 py-3 text-sm font-semibold md:flex">
             <FontAwesomeIcon icon="phone" />
             {{ brand.phone }}
           </a>
-          <a href="/admin" class="bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black">Log In</a>
+          <a href="/admin" class="rounded-full bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black">Log In</a>
         </div>
       </div>
     </header>
@@ -292,17 +292,17 @@ async function loginAdmin() {
           :transition="{ duration: 0.55, ease: 'easeOut' }"
         >
           <div class="mb-7 flex flex-wrap gap-2">
-            <span v-for="badge in trustBadges" :key="badge" class="border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
+            <span v-for="badge in trustBadges" :key="badge" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
           </div>
           <h1 class="max-w-3xl text-5xl font-bold leading-[1.02] tracking-tight md:text-7xl">
             UK removals, <span class="text-dach-orange">made simple.</span>
           </h1>
           <p class="mt-5 max-w-xl text-lg leading-8 text-white/82">Fast quotes. Careful movers. Clear pricing.</p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <a href="#quote" class="bg-dach-orange px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
+            <a href="#quote" class="rounded-full bg-dach-orange px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               Get a Quote <FontAwesomeIcon icon="arrow-right" class="ml-2" />
             </a>
-            <a :href="`tel:${brand.phone}`" class="border border-white/25 px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
+            <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/25 px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               <FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}
             </a>
           </div>
@@ -322,7 +322,7 @@ async function loginAdmin() {
         <Motion
           id="quote"
           as="form"
-          class="relative z-10 border border-white/25 bg-dach-black/35 p-7 text-white shadow-2xl shadow-black/35 backdrop-blur-md"
+          class="relative z-10 rounded-3xl border border-white/25 bg-dach-black/35 p-7 text-white shadow-2xl shadow-black/35 backdrop-blur-md"
           :initial="{ opacity: 0, y: 26 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
@@ -332,28 +332,28 @@ async function loginAdmin() {
           <p class="mt-2 text-sm text-white/75">Enter your details. We confirm the rest.</p>
 
           <label class="mt-6 block text-sm font-semibold">Moving From</label>
-          <div class="mt-2 flex items-center gap-3 border border-white/15 bg-white/15 px-4 py-4 text-white/75">
+          <div class="mt-2 flex items-center gap-3 rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white/75">
             <FontAwesomeIcon icon="location-dot" />
             <input v-model="quoteForm.pickupPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Enter postcode" />
           </div>
 
           <label class="mt-4 block text-sm font-semibold">Moving To</label>
-          <div class="mt-2 flex items-center gap-3 border border-white/15 bg-white/15 px-4 py-4 text-white/75">
+          <div class="mt-2 flex items-center gap-3 rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white/75">
             <FontAwesomeIcon icon="route" />
             <input v-model="quoteForm.deliveryPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Enter postcode" />
           </div>
 
           <div class="mt-4 grid gap-3 md:grid-cols-2">
-            <select v-model="quoteForm.serviceType" class="border border-white/15 bg-white/15 px-4 py-4 text-white outline-none">
+            <select v-model="quoteForm.serviceType" class="rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white outline-none">
               <option>House Move</option>
               <option>Man and Van</option>
               <option>Office Relocation</option>
               <option>Packing and Storage</option>
             </select>
-            <input v-model="quoteForm.preferredDate" class="border border-white/15 bg-white/15 px-4 py-4 text-white outline-none placeholder:text-white/55" placeholder="dd/mm/yyyy" />
+            <input v-model="quoteForm.preferredDate" class="rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white outline-none placeholder:text-white/55" placeholder="dd/mm/yyyy" />
           </div>
 
-          <button class="mt-6 w-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-dach-black">
+          <button class="mt-6 w-full rounded-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
             See Price Instantly <FontAwesomeIcon icon="arrow-right" class="ml-2" />
           </button>
           <p class="mt-4 text-center text-sm text-white/75"><FontAwesomeIcon icon="lock" class="mr-1" /> Secure enquiry. Rated 4.8/5.</p>
@@ -361,7 +361,9 @@ async function loginAdmin() {
       </div>
     </section>
 
-    <section id="how-it-works" class="section-wrap py-24">
+    <section id="how-it-works" class="section-wrap relative overflow-hidden py-24">
+      <span class="route-lines right-0 top-10 opacity-50" />
+      <span class="corner-mark bottom-12 left-0 opacity-60" />
       <div class="grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end">
         <h2 class="text-4xl font-bold tracking-tight md:text-5xl">How it works.</h2>
         <p class="text-lg leading-8 text-dach-muted">Five quick steps from quote to moving day.</p>
@@ -371,11 +373,11 @@ async function loginAdmin() {
           v-for="(step, index) in quoteSteps"
           :key="step.title"
           as="article"
-          class="border border-dach-line bg-white p-6 shadow-sm"
+          class="rounded-3xl border border-dach-line bg-white p-6 shadow-sm"
           :whileHover="{ y: -5 }"
           :transition="{ duration: 0.2, ease: 'easeOut' }"
         >
-          <span class="mb-7 flex h-11 w-11 items-center justify-center bg-dach-orange text-white"><FontAwesomeIcon :icon="step.icon" /></span>
+          <span class="mb-7 flex h-11 w-11 items-center justify-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="step.icon" /></span>
           <span class="text-sm font-semibold text-dach-muted">0{{ index + 1 }}</span>
           <h3 class="mt-3 text-lg font-bold">{{ step.title }}</h3>
           <p class="mt-3 text-sm leading-6 text-dach-muted">{{ step.copy }}</p>
@@ -383,7 +385,8 @@ async function loginAdmin() {
       </div>
     </section>
 
-    <section id="services" class="border-y border-dach-line bg-white py-20">
+    <section id="services" class="relative overflow-hidden border-y border-dach-line bg-white py-20">
+      <div class="abstract-grid absolute inset-y-0 right-0 w-1/2 opacity-50" />
       <div class="section-wrap">
         <div class="grid gap-4 lg:grid-cols-[0.7fr_1fr] lg:items-end">
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Services.</h2>
@@ -391,10 +394,10 @@ async function loginAdmin() {
         </div>
 
         <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          <article v-for="(service, index) in services" :key="service.title" class="border border-dach-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100">
+          <article v-for="(service, index) in services" :key="service.title" class="relative overflow-hidden rounded-3xl border border-dach-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100">
             <img v-if="index < 2" :src="service.image" :alt="service.title" class="h-44 w-full object-cover" />
             <div class="p-6">
-              <span class="mb-5 flex h-11 w-11 items-center justify-center bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
+              <span class="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
               <h3 class="text-xl font-bold">{{ service.title }}</h3>
               <p class="mt-3 min-h-14 leading-7 text-dach-muted">{{ service.description }}</p>
               <ul v-if="index < 2" class="mt-4 grid gap-2 text-sm text-dach-muted">
@@ -407,17 +410,18 @@ async function loginAdmin() {
       </div>
     </section>
 
-    <section id="areas" class="border-y border-dach-line bg-gray-50 py-24">
+    <section id="areas" class="relative overflow-hidden border-y border-dach-line bg-gray-50 py-24">
+      <span class="route-lines left-10 top-24 opacity-40" />
       <div class="section-wrap grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
         <div>
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover.</h2>
           <p class="mt-5 leading-8 text-dach-muted">Local and long-distance removals across the UK.</p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <span v-for="routePair in routePairs" :key="routePair" class="bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
+            <span v-for="routePair in routePairs" :key="routePair" class="rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
           </div>
         </div>
         <div class="grid gap-5 md:grid-cols-2">
-          <article v-for="[area, cities] in areas" :key="area" class="bg-white p-6 shadow-sm">
+          <article v-for="[area, cities] in areas" :key="area" class="rounded-3xl bg-white p-6 shadow-sm">
             <h3 class="text-lg font-bold"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />{{ area }}</h3>
             <ul class="mt-4 grid gap-2 text-sm text-dach-muted">
               <li v-for="city in cities" :key="city">-> {{ city }}</li>
@@ -434,7 +438,7 @@ async function loginAdmin() {
         <p class="mt-8 font-semibold">Need help? <a :href="`mailto:${brand.email}`" class="text-dach-orange">{{ brand.email }}</a></p>
       </div>
       <div class="space-y-3">
-        <article v-for="(faq, index) in faqs" :key="faq" class="border border-dach-line">
+        <article v-for="(faq, index) in faqs" :key="faq" class="overflow-hidden rounded-2xl border border-dach-line">
           <button class="flex w-full items-center justify-between p-5 text-left font-semibold" @click="openFaq = openFaq === index ? -1 : index">
             {{ faq }}
             <FontAwesomeIcon :icon="openFaq === index ? 'chevron-down' : 'arrow-right'" class="text-dach-orange" />
@@ -446,15 +450,16 @@ async function loginAdmin() {
       </div>
     </section>
 
-    <section class="bg-dach-black py-20 text-white">
+    <section class="relative overflow-hidden bg-dach-black py-20 text-white">
+      <span class="corner-mark right-24 top-8 border-white/15 opacity-60" />
       <div class="section-wrap grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Ready to move?</h2>
           <p class="mt-4 max-w-2xl leading-8 text-white/70">Get a quote or call the team.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <a href="#quote" class="bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
-          <a :href="`tel:${brand.phone}`" class="border border-white/20 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
+          <a href="#quote" class="rounded-full bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
+          <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/20 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
         </div>
       </div>
     </section>

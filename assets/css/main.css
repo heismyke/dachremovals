@@ -90,6 +90,32 @@ h3 {
   animation: rise-in 680ms ease both;
 }
 
+.abstract-grid {
+  background-image:
+    linear-gradient(rgba(255, 79, 31, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 79, 31, 0.08) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.corner-mark {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-top: 1px solid rgba(255, 79, 31, 0.26);
+  border-left: 1px solid rgba(255, 79, 31, 0.26);
+  pointer-events: none;
+}
+
+.route-lines {
+  position: absolute;
+  width: 300px;
+  height: 180px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 48%, rgba(255, 79, 31, 0.22) 49%, rgba(255, 79, 31, 0.22) 51%, transparent 52%),
+    linear-gradient(25deg, transparent 48%, rgba(21, 21, 21, 0.08) 49%, rgba(21, 21, 21, 0.08) 51%, transparent 52%);
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
