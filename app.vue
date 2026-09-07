@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
-import { adminNavItems, calendarCells, calendarDays, editableSections } from './data/admin'
+import { adminNavItems, calendarCells, calendarDays } from './data/admin'
 import { areas, brand, faqs, navigation, quoteSteps, routePairs, services, trustBadges } from './data/content'
 
 const route = useRoute()
@@ -9,10 +9,9 @@ const config = useRuntimeConfig()
 const openFaq = ref(0)
 const currentHeroSlide = ref(0)
 const adminLoading = ref(false)
-const adminError = ref('')
 const loginError = ref('')
 const quoteSearch = ref('')
-const selectedContent = ref('hero')
+const selectedContent = ref('business-profile')
 const adminLogin = reactive({
   username: 'admin',
   password: 'password',
@@ -27,6 +26,39 @@ const heroSlides = [
   { title: 'House removals', image: '/images/hero-removals.png', position: 'object-center' },
   { title: 'Man and van', image: '/images/hero-removals.png', position: 'object-left' },
   { title: 'Same-day moves', image: '/images/hero-removals.png', position: 'object-right' },
+]
+const fallbackContentSections: ContentSection[] = [
+  {
+    id: 'business-profile',
+    label: 'Business Profile',
+    fields: {
+      company: brand.name,
+      phone: brand.phone,
+      email: brand.email,
+      coverage: 'UK-wide removals with same-day availability where possible.',
+      promise: 'Clear pricing, careful movers, direct customer support.',
+    },
+  },
+  {
+    id: 'quote-workflow',
+    label: 'Quote Workflow',
+    fields: {
+      stages: 'New inquiry -> Qualified -> Quote sent -> Booked -> Dispatch ready',
+      responseTarget: 'Respond to new quotes within 60 minutes.',
+      requiredDetails: 'Pickup, delivery, service type, preferred date, access notes.',
+      followUp: 'Call once, send written confirmation, then schedule the move.',
+    },
+  },
+  {
+    id: 'operations',
+    label: 'Operations',
+    fields: {
+      crewPlanning: 'Match crew size and van type to move size, access, and distance.',
+      dispatchNotes: 'Capture parking, stairs, lifts, fragile items, and time windows.',
+      insurance: 'Confirm insurance and handling notes before booking.',
+      reviewRequest: 'Ask every completed customer for a review after the move.',
+    },
+  },
 ]
 type QuoteRequest = {
   id: string
@@ -125,7 +157,8 @@ const dashboardStats = computed(() => [
     tone: 'text-dach-muted',
   },
 ])
-const selectedContentSection = computed(() => contentSections.value.find((section) => section.id === selectedContent.value))
+const availableContentSections = computed(() => contentSections.value.length ? contentSections.value : fallbackContentSections)
+const selectedContentSection = computed(() => availableContentSections.value.find((section) => section.id === selectedContent.value) || availableContentSections.value[0])
 
 let heroTimer: ReturnType<typeof setInterval> | undefined
 
@@ -153,7 +186,6 @@ async function apiGet<T>(path: string) {
 
 async function loadAdminData() {
   adminLoading.value = true
-  adminError.value = ''
   try {
     const [quoteData, bookingData, messageData, contentData] = await Promise.all([
       apiGet<QuoteRequest[]>('/api/quotes'),
@@ -165,8 +197,13 @@ async function loadAdminData() {
     bookings.value = bookingData
     messages.value = messageData
     contentSections.value = contentData
+    if (!availableContentSections.value.some((section) => section.id === selectedContent.value)) {
+      selectedContent.value = availableContentSections.value[0]?.id || 'business-profile'
+    }
   } catch (error) {
-    adminError.value = 'Showing saved admin view. New records will appear when the engine is connected.'
+    if (!contentSections.value.length) {
+      contentSections.value = fallbackContentSections
+    }
   } finally {
     adminLoading.value = false
   }
@@ -508,7 +545,7 @@ async function loginAdmin() {
           <div>
             <p class="text-xs font-bold uppercase tracking-[0.18em] text-dach-orange">Dach Removals</p>
             <h1 class="mt-1 font-google-sans text-3xl font-bold">
-              {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings Calendar' : activeAdminView === 'messages' ? 'Messages' : 'Edit Content' }}
+              {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings Calendar' : activeAdminView === 'messages' ? 'Messages' : 'Business Setup' }}
             </h1>
           </div>
           <div class="flex items-center gap-4">
@@ -517,10 +554,6 @@ async function loginAdmin() {
             </button>
             <p class="text-sm text-dach-muted">Mon, 7 September 2026</p>
           </div>
-        </div>
-        <div v-if="adminError" class="mt-4 flex items-center gap-3 border border-dach-line bg-[#faf7f4] px-4 py-3 text-sm font-medium text-dach-muted">
-          <span class="grid h-7 w-7 place-items-center bg-white text-dach-orange"><FontAwesomeIcon icon="clock" /></span>
-          <span>{{ adminError }}</span>
         </div>
       </header>
 
@@ -551,8 +584,12 @@ async function loginAdmin() {
                 <span class="self-start bg-dach-orange/10 px-3 py-1 text-xs font-bold uppercase text-dach-orange">{{ quote.status }}</span>
               </div>
             </div>
-            <div v-else class="grid h-72 place-items-center text-center text-dach-muted">
-              <p><FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl text-dach-orange/70" /><br />No quotes yet</p>
+            <div v-else class="grid h-72 place-items-center p-8 text-center text-dach-muted">
+              <div>
+                <FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl text-dach-orange/70" />
+                <p class="font-semibold text-dach-black">No quote requests yet</p>
+                <p class="mt-2 max-w-sm text-sm leading-6">New website enquiries will appear here with route, service, date, and contact details.</p>
+              </div>
             </div>
           </article>
 
@@ -567,8 +604,33 @@ async function loginAdmin() {
                 <p class="mt-1 text-sm text-dach-muted">{{ booking.bookingDate || 'Date pending' }} · {{ booking.pickupPostcode }} -> {{ booking.deliveryPostcode }}</p>
               </div>
             </div>
-            <div v-else class="grid h-72 place-items-center text-center text-dach-muted">
-              <p><FontAwesomeIcon icon="calendar-days" class="mb-4 text-4xl text-dach-orange/70" /><br />No upcoming bookings</p>
+            <div v-else class="grid h-72 place-items-center p-8 text-center text-dach-muted">
+              <div>
+                <FontAwesomeIcon icon="calendar-days" class="mb-4 text-4xl text-dach-orange/70" />
+                <p class="font-semibold text-dach-black">No booked moves yet</p>
+                <p class="mt-2 max-w-sm text-sm leading-6">Accepted quotes become scheduled jobs for the office and moving crew.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+          <article class="border border-dach-line bg-white p-6 shadow-sm">
+            <h2 class="font-google-sans text-xl font-bold">Move Pipeline</h2>
+            <div class="mt-6 grid gap-3">
+              <div v-for="stage in ['New inquiry', 'Qualified', 'Quote sent', 'Booked', 'Dispatch ready']" :key="stage" class="flex items-center justify-between border border-dach-line px-4 py-3">
+                <span class="font-semibold">{{ stage }}</span>
+                <span class="text-sm text-dach-muted">{{ stage === 'New inquiry' ? quotes.length : stage === 'Booked' ? bookings.length : 0 }}</span>
+              </div>
+            </div>
+          </article>
+          <article class="border border-dach-line bg-[#151515] p-6 text-white shadow-sm">
+            <h2 class="font-google-sans text-xl font-bold">Dispatch Checklist</h2>
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />Confirm pickup, delivery, access, and parking.</p>
+              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="user-group" class="mr-2 text-dach-orange" />Assign crew size and van type.</p>
+              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="shield-halved" class="mr-2 text-dach-orange" />Check insurance and fragile item notes.</p>
+              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="phone" class="mr-2 text-dach-orange" />Send final confirmation to the customer.</p>
             </div>
           </article>
         </div>
@@ -664,11 +726,14 @@ async function loginAdmin() {
       </section>
 
       <section v-if="activeAdminView === 'content'" class="p-9">
-        <h2 class="mb-6 font-google-sans text-2xl font-bold">Edit Website Content</h2>
+        <div class="mb-6">
+          <h2 class="font-google-sans text-2xl font-bold">Business Setup</h2>
+          <p class="mt-1 text-dach-muted">Keep quote handling, contact details, and operations rules in one place.</p>
+        </div>
         <div class="grid grid-cols-[300px_1fr] gap-6">
           <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
             <button
-              v-for="item in contentSections.length ? contentSections : editableSections.map((item) => ({ id: item.label.toLowerCase().replaceAll(' ', '-'), label: item.label, fields: {} }))"
+              v-for="item in availableContentSections"
               :key="item.label"
               class="block w-full border-b border-dach-line p-5 text-left transition hover:bg-dach-cream/60"
               :class="selectedContent === item.id ? 'bg-dach-orange text-white hover:bg-dach-orange' : ''"
@@ -676,7 +741,7 @@ async function loginAdmin() {
               @click="selectedContent = item.id"
             >
               <strong>{{ item.label }}</strong>
-              <span class="mt-1 block text-sm" :class="selectedContent === item.id ? 'text-white/70' : 'text-dach-muted'">{{ Object.keys(item.fields || {}).length || 0 }} fields</span>
+              <span class="mt-1 block text-sm" :class="selectedContent === item.id ? 'text-white/70' : 'text-dach-muted'">{{ Object.keys(item.fields || {}).length || 0 }} settings</span>
             </button>
           </div>
           <div class="min-h-72 border border-dach-line bg-white p-7 shadow-sm">
