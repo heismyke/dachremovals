@@ -1,16 +1,79 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
-import { adminNavItems, calendarCells, calendarDays, dashboardCards, editableSections } from './data/admin'
+import { adminNavItems, calendarCells, calendarDays, editableSections } from './data/admin'
 import { areas, brand, faqs, navigation, quoteSteps, routePairs, services, trustBadges } from './data/content'
 
 const route = useRoute()
+const router = useRouter()
+const config = useRuntimeConfig()
 const openFaq = ref(0)
 const currentHeroSlide = ref(0)
+const adminLoading = ref(false)
+const adminError = ref('')
+const loginError = ref('')
+const quoteSearch = ref('')
+const selectedContent = ref('hero')
+const adminLogin = reactive({
+  username: 'admin',
+  password: 'password',
+})
+const quoteForm = reactive({
+  pickupPostcode: '',
+  deliveryPostcode: '',
+  serviceType: 'House Move',
+  preferredDate: '',
+})
 const heroSlides = [
   { title: 'House removals', image: '/images/hero-removals.png', position: 'object-center' },
   { title: 'Man and van', image: '/images/hero-removals.png', position: 'object-left' },
   { title: 'Same-day moves', image: '/images/hero-removals.png', position: 'object-right' },
 ]
+type QuoteRequest = {
+  id: string
+  fullName: string
+  phoneNumber: string
+  emailAddress: string
+  serviceType: string
+  pickupPostcode: string
+  deliveryPostcode: string
+  preferredDate: string
+  flexibleOnDate: boolean
+  additionalNotes: string
+  status: string
+  createdAt: string
+}
+type Booking = {
+  id: string
+  quoteRequestId: string
+  customerName: string
+  phoneNumber: string
+  serviceType: string
+  pickupPostcode: string
+  deliveryPostcode: string
+  bookingDate: string
+  status: string
+  notes: string
+  createdAt: string
+}
+type AdminMessage = {
+  id: string
+  senderName: string
+  senderEmail: string
+  senderPhone: string
+  subject: string
+  body: string
+  isRead: boolean
+  createdAt: string
+}
+type ContentSection = {
+  id: string
+  label: string
+  fields: Record<string, string>
+}
+const quotes = ref<QuoteRequest[]>([])
+const bookings = ref<Booking[]>([])
+const messages = ref<AdminMessage[]>([])
+const contentSections = ref<ContentSection[]>([])
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const activeAdminView = computed(() => {
   if (route.path.includes('/quotes')) return 'quotes'
@@ -20,6 +83,49 @@ const activeAdminView = computed(() => {
   if (route.path.includes('/login')) return 'login'
   return 'dashboard'
 })
+const apiBase = computed(() => config.public.apiBase as string)
+const filteredQuotes = computed(() => {
+  const term = quoteSearch.value.trim().toLowerCase()
+  if (!term) return quotes.value
+  return quotes.value.filter((quote) =>
+    [quote.fullName, quote.pickupPostcode, quote.deliveryPostcode, quote.serviceType, quote.status]
+      .some((value) => value?.toLowerCase().includes(term)),
+  )
+})
+const unreadMessages = computed(() => messages.value.filter((message) => !message.isRead))
+const confirmedBookings = computed(() => bookings.value.filter((booking) => booking.status === 'confirmed'))
+const nextBooking = computed(() => bookings.value.find((booking) => booking.bookingDate) || bookings.value[0])
+const dashboardStats = computed(() => [
+  {
+    label: 'New Quotes',
+    value: quotes.value.filter((quote) => quote.status === 'new').length,
+    note: 'Awaiting response',
+    icon: 'clipboard',
+    tone: 'text-dach-orange',
+  },
+  {
+    label: 'Bookings This Month',
+    value: bookings.value.length,
+    note: 'Confirmed jobs',
+    icon: 'calendar-days',
+    tone: 'text-green-600',
+  },
+  {
+    label: 'Unread Messages',
+    value: unreadMessages.value.length,
+    note: 'Needs attention',
+    icon: 'envelope',
+    tone: 'text-dach-orange',
+  },
+  {
+    label: 'Next Job',
+    value: nextBooking.value?.bookingDate || '-',
+    note: nextBooking.value?.customerName || 'No booking scheduled',
+    icon: 'truck',
+    tone: 'text-dach-muted',
+  },
+])
+const selectedContentSection = computed(() => contentSections.value.find((section) => section.id === selectedContent.value))
 
 let heroTimer: ReturnType<typeof setInterval> | undefined
 
@@ -27,11 +133,77 @@ onMounted(() => {
   heroTimer = setInterval(() => {
     currentHeroSlide.value = (currentHeroSlide.value + 1) % heroSlides.length
   }, 4500)
+
+  if (isAdminRoute.value) {
+    loadAdminData()
+  }
 })
 
 onBeforeUnmount(() => {
   if (heroTimer) clearInterval(heroTimer)
 })
+
+watch(isAdminRoute, (value) => {
+  if (value) loadAdminData()
+})
+
+async function apiGet<T>(path: string) {
+  return await $fetch<T>(`${apiBase.value}${path}`)
+}
+
+async function loadAdminData() {
+  adminLoading.value = true
+  adminError.value = ''
+  try {
+    const [quoteData, bookingData, messageData, contentData] = await Promise.all([
+      apiGet<QuoteRequest[]>('/api/quotes'),
+      apiGet<Booking[]>('/api/bookings'),
+      apiGet<AdminMessage[]>('/api/messages'),
+      apiGet<ContentSection[]>('/api/content'),
+    ])
+    quotes.value = quoteData
+    bookings.value = bookingData
+    messages.value = messageData
+    contentSections.value = contentData
+  } catch (error) {
+    adminError.value = 'Backend is offline. Start dachremovals-engine on port 8080.'
+  } finally {
+    adminLoading.value = false
+  }
+}
+
+async function submitQuote() {
+  await $fetch(`${apiBase.value}/api/quotes`, {
+    method: 'POST',
+    body: {
+      fullName: 'Website Visitor',
+      phoneNumber: '',
+      emailAddress: '',
+      serviceType: quoteForm.serviceType,
+      pickupPostcode: quoteForm.pickupPostcode,
+      deliveryPostcode: quoteForm.deliveryPostcode,
+      preferredDate: quoteForm.preferredDate,
+      flexibleOnDate: true,
+      additionalNotes: 'Submitted from landing quote form.',
+    },
+  })
+  quoteForm.pickupPostcode = ''
+  quoteForm.deliveryPostcode = ''
+  quoteForm.preferredDate = ''
+}
+
+async function loginAdmin() {
+  loginError.value = ''
+  try {
+    await $fetch(`${apiBase.value}/api/auth/login`, {
+      method: 'POST',
+      body: adminLogin,
+    })
+    await router.push('/admin/dashboard')
+  } catch (error) {
+    loginError.value = 'Invalid credentials or backend offline.'
+  }
+}
 </script>
 
 <template>
@@ -116,6 +288,7 @@ onBeforeUnmount(() => {
           :initial="{ opacity: 0, y: 26 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
+          @submit.prevent="submitQuote"
         >
           <h2 class="text-2xl font-bold tracking-tight">Get Your Price</h2>
           <p class="mt-2 text-sm text-dach-muted">Enter your details. We confirm the rest.</p>
@@ -123,23 +296,23 @@ onBeforeUnmount(() => {
           <label class="mt-6 block text-sm font-semibold">Moving From</label>
           <div class="mt-2 flex items-center gap-3 bg-dach-cream px-4 py-4 text-dach-muted">
             <FontAwesomeIcon icon="location-dot" />
-            <input class="w-full bg-transparent outline-none" placeholder="Enter postcode" />
+            <input v-model="quoteForm.pickupPostcode" class="w-full bg-transparent outline-none" placeholder="Enter postcode" />
           </div>
 
           <label class="mt-4 block text-sm font-semibold">Moving To</label>
           <div class="mt-2 flex items-center gap-3 bg-dach-cream px-4 py-4 text-dach-muted">
             <FontAwesomeIcon icon="route" />
-            <input class="w-full bg-transparent outline-none" placeholder="Enter postcode" />
+            <input v-model="quoteForm.deliveryPostcode" class="w-full bg-transparent outline-none" placeholder="Enter postcode" />
           </div>
 
           <div class="mt-4 grid gap-3 md:grid-cols-2">
-            <select class="bg-dach-cream px-4 py-4 text-dach-muted outline-none">
+            <select v-model="quoteForm.serviceType" class="bg-dach-cream px-4 py-4 text-dach-muted outline-none">
               <option>House Move</option>
               <option>Man and Van</option>
               <option>Office Relocation</option>
               <option>Packing and Storage</option>
             </select>
-            <input class="bg-dach-cream px-4 py-4 text-dach-muted outline-none" placeholder="dd/mm/yyyy" />
+            <input v-model="quoteForm.preferredDate" class="bg-dach-cream px-4 py-4 text-dach-muted outline-none" placeholder="dd/mm/yyyy" />
           </div>
 
           <button class="mt-6 w-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-dach-black">
@@ -279,135 +452,246 @@ onBeforeUnmount(() => {
   </main>
 
   <div v-else-if="activeAdminView === 'login'" class="grid min-h-screen place-items-center bg-dach-black">
-    <form class="w-[420px] border-t-4 border-dach-orange bg-white p-12 shadow-2xl">
+    <form class="w-[420px] border-t-4 border-dach-orange bg-white p-12 shadow-2xl" @submit.prevent="loginAdmin">
       <img src="/images/logo.jpg" alt="Dach Removals" class="mb-8 h-14 w-auto object-contain" />
       <p class="mb-8 text-sm font-bold uppercase tracking-[0.25em] text-dach-muted">Admin Portal</p>
       <label class="text-xs font-bold uppercase tracking-[0.2em] text-dach-muted">Username</label>
-      <input value="admin" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
+      <input v-model="adminLogin.username" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
       <label class="mt-5 block text-xs font-bold uppercase tracking-[0.2em] text-dach-muted">Password</label>
-      <input type="password" value="password" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
-      <NuxtLink to="/admin/dashboard" class="mt-6 block bg-dach-orange px-6 py-4 text-center font-black uppercase text-white">
+      <input v-model="adminLogin.password" type="password" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
+      <button class="mt-6 block w-full bg-dach-orange px-6 py-4 text-center font-black uppercase text-white" type="submit">
         Sign In <FontAwesomeIcon icon="arrow-right" />
-      </NuxtLink>
+      </button>
+      <p v-if="loginError" class="mt-4 text-sm font-semibold text-dach-orange">{{ loginError }}</p>
       <a href="/" class="mt-8 block text-center text-sm text-dach-muted"><FontAwesomeIcon icon="arrow-left" /> Back to website</a>
     </form>
   </div>
 
-  <div v-else class="grid min-h-screen grid-cols-[300px_1fr] bg-dach-cream">
-    <aside class="flex flex-col bg-dach-black text-white">
-      <div class="flex h-28 flex-col items-start justify-center border-b border-white/10 px-7">
+  <div v-else class="grid min-h-screen grid-cols-[288px_1fr] bg-[#f7f3ef] text-dach-black">
+    <aside class="sticky top-0 flex h-screen flex-col bg-[#111111] text-white">
+      <div class="border-b border-white/10 px-6 py-6">
         <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto bg-white object-contain" />
-        <span class="mt-2 text-[11px] uppercase tracking-[0.25em] text-white/40">Admin Panel</span>
+        <div class="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+          <span class="h-2 w-2 rounded-full bg-green-500" />
+          Admin console
+        </div>
       </div>
 
-      <nav class="mt-4">
+      <nav class="space-y-1 px-4 py-5">
         <NuxtLink
           v-for="item in adminNavItems"
           :key="item.label"
           :to="item.path"
-          class="flex items-center gap-4 px-8 py-5 text-white/45"
-          :class="route.path === item.path ? 'border-l-4 border-dach-orange bg-dach-orange/20 text-dach-orange' : 'hover:text-white'"
+          class="group flex items-center gap-4 px-4 py-4 text-sm font-semibold text-white/55 transition hover:bg-white/5 hover:text-white"
+          :class="route.path === item.path ? 'bg-dach-orange text-white shadow-lg shadow-dach-orange/20 hover:bg-dach-orange' : ''"
         >
-          <FontAwesomeIcon :icon="item.icon" />
+          <span class="grid h-9 w-9 place-items-center bg-white/8 text-white/60 group-hover:text-white" :class="route.path === item.path ? 'bg-white/15 text-white' : ''">
+            <FontAwesomeIcon :icon="item.icon" />
+          </span>
           <span>{{ item.label }}</span>
-          <span v-if="item.badge !== undefined" class="ml-auto rounded-full bg-dach-orange px-3 py-1 text-xs font-black text-white">{{ item.badge }}</span>
+          <span
+            v-if="item.badge !== undefined"
+            class="ml-auto rounded-full px-2.5 py-1 text-xs font-bold"
+            :class="route.path === item.path ? 'bg-white text-dach-orange' : 'bg-dach-orange text-white'"
+          >
+            {{ item.label === 'Quote Requests' ? quotes.length : item.label === 'Messages' ? unreadMessages.length : item.badge }}
+          </span>
         </NuxtLink>
       </nav>
 
-      <div class="mt-auto border-t border-white/10 p-7 text-white/45">
-        <a href="/" class="mb-4 block"><FontAwesomeIcon icon="globe" class="mr-2" />View Website</a>
-        <NuxtLink to="/admin/login"><FontAwesomeIcon icon="right-from-bracket" class="mr-2" />Sign Out</NuxtLink>
+      <div class="mx-4 mt-auto border-t border-white/10 py-5 text-sm font-semibold text-white/45">
+        <a href="/" class="flex items-center gap-3 px-4 py-3 transition hover:text-white"><FontAwesomeIcon icon="globe" />View Website</a>
+        <NuxtLink to="/admin/login" class="flex items-center gap-3 px-4 py-3 transition hover:text-white"><FontAwesomeIcon icon="right-from-bracket" />Sign Out</NuxtLink>
       </div>
     </aside>
 
-    <main>
-      <header class="flex h-20 items-center justify-between bg-white px-9">
-        <h1 class="display-title text-2xl font-extrabold">
-          {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings Calendar' : activeAdminView === 'messages' ? 'Messages' : 'Edit Content' }}
-        </h1>
-        <p class="text-dach-muted">Mon, 7 September 2026 <span class="ml-3 text-green-600">Live</span></p>
+    <main class="min-w-0">
+      <header class="sticky top-0 z-30 border-b border-dach-line bg-white/95 px-9 py-5 backdrop-blur">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-dach-orange">Dach Removals</p>
+            <h1 class="mt-1 font-google-sans text-3xl font-bold">
+              {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings Calendar' : activeAdminView === 'messages' ? 'Messages' : 'Edit Content' }}
+            </h1>
+          </div>
+          <div class="flex items-center gap-4">
+            <button class="border border-dach-line bg-white px-4 py-3 text-sm font-semibold text-dach-muted" type="button" @click="loadAdminData">
+              <FontAwesomeIcon icon="bolt" class="mr-2 text-dach-orange" />Refresh
+            </button>
+            <p class="text-sm text-dach-muted">Mon, 7 September 2026 <span class="ml-3 font-semibold text-green-600">Live</span></p>
+          </div>
+        </div>
+        <p v-if="adminError" class="mt-4 border border-dach-orange/25 bg-dach-orange/10 px-4 py-3 text-sm font-semibold text-dach-orange">{{ adminError }}</p>
       </header>
 
       <section v-if="activeAdminView === 'dashboard'" class="p-9">
-        <div class="grid gap-6 xl:grid-cols-4">
-          <article v-for="card in dashboardCards" :key="card.label" class="border border-dach-line bg-white p-8">
-            <p class="text-sm font-bold uppercase tracking-[0.2em] text-dach-muted">{{ card.label }}</p>
-            <p class="display-title mt-3 text-5xl font-extrabold">{{ card.value }}</p>
-            <p :class="card.tone" class="mt-3">{{ card.note }}</p>
+        <div class="grid gap-5 xl:grid-cols-4">
+          <article v-for="card in dashboardStats" :key="card.label" class="border border-dach-line bg-white p-6 shadow-sm">
+            <div class="flex items-start justify-between">
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-dach-muted">{{ card.label }}</p>
+              <span class="grid h-10 w-10 place-items-center bg-dach-orange/10 text-dach-orange"><FontAwesomeIcon :icon="card.icon" /></span>
+            </div>
+            <p class="mt-5 font-google-sans text-4xl font-bold">{{ card.value }}</p>
+            <p :class="card.tone" class="mt-2 text-sm font-medium">{{ card.note }}</p>
           </article>
         </div>
-        <div class="mt-9 grid gap-8 xl:grid-cols-2">
-          <article>
-            <div class="mb-6 flex items-center justify-between">
-              <h2 class="display-title text-2xl font-extrabold">Recent Quotes</h2>
-              <NuxtLink to="/admin/quotes" class="border border-dach-line bg-white px-5 py-3 font-bold">View All</NuxtLink>
+
+        <div class="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <article class="border border-dach-line bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-dach-line px-6 py-5">
+              <h2 class="font-google-sans text-xl font-bold">Recent Quotes</h2>
+              <NuxtLink to="/admin/quotes" class="border border-dach-line px-4 py-2 text-sm font-semibold">View All</NuxtLink>
             </div>
-            <div class="grid h-80 place-items-center text-dach-muted">
-              <p class="text-center text-lg"><FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl" /><br />No quotes yet</p>
+            <div v-if="quotes.length" class="divide-y divide-dach-line">
+              <div v-for="quote in quotes.slice(0, 5)" :key="quote.id" class="grid grid-cols-[1fr_auto] gap-4 px-6 py-4">
+                <div>
+                  <p class="font-semibold">{{ quote.fullName || 'Website Visitor' }}</p>
+                  <p class="mt-1 text-sm text-dach-muted">{{ quote.pickupPostcode || 'Pickup' }} -> {{ quote.deliveryPostcode || 'Delivery' }} · {{ quote.serviceType }}</p>
+                </div>
+                <span class="self-start bg-dach-orange/10 px-3 py-1 text-xs font-bold uppercase text-dach-orange">{{ quote.status }}</span>
+              </div>
+            </div>
+            <div v-else class="grid h-72 place-items-center text-center text-dach-muted">
+              <p><FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl text-dach-orange/70" /><br />No quotes yet</p>
             </div>
           </article>
-          <article>
-            <div class="mb-6 flex items-center justify-between">
-              <h2 class="display-title text-2xl font-extrabold">Upcoming Bookings</h2>
-              <NuxtLink to="/admin/bookings" class="border border-dach-line bg-white px-5 py-3 font-bold">Calendar</NuxtLink>
+
+          <article class="border border-dach-line bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-dach-line px-6 py-5">
+              <h2 class="font-google-sans text-xl font-bold">Upcoming Bookings</h2>
+              <NuxtLink to="/admin/bookings" class="border border-dach-line px-4 py-2 text-sm font-semibold">Calendar</NuxtLink>
             </div>
-            <div class="grid h-80 place-items-center text-dach-muted">
-              <p class="text-center text-lg"><FontAwesomeIcon icon="calendar-days" class="mb-4 text-4xl" /><br />No upcoming bookings</p>
+            <div v-if="bookings.length" class="divide-y divide-dach-line">
+              <div v-for="booking in bookings.slice(0, 5)" :key="booking.id" class="px-6 py-4">
+                <p class="font-semibold">{{ booking.customerName }}</p>
+                <p class="mt-1 text-sm text-dach-muted">{{ booking.bookingDate || 'Date pending' }} · {{ booking.pickupPostcode }} -> {{ booking.deliveryPostcode }}</p>
+              </div>
+            </div>
+            <div v-else class="grid h-72 place-items-center text-center text-dach-muted">
+              <p><FontAwesomeIcon icon="calendar-days" class="mb-4 text-4xl text-dach-orange/70" /><br />No upcoming bookings</p>
             </div>
           </article>
         </div>
       </section>
 
       <section v-if="activeAdminView === 'quotes'" class="p-9">
-        <div class="flex items-center justify-between">
-          <h2 class="display-title text-2xl font-extrabold">All Quote Requests</h2>
-          <input class="border border-dach-line bg-white px-5 py-4" placeholder="Search name or postcode..." />
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <div>
+            <h2 class="font-google-sans text-2xl font-bold">All Quote Requests</h2>
+            <p class="mt-1 text-dach-muted">{{ filteredQuotes.length }} requests found</p>
+          </div>
+          <input v-model="quoteSearch" class="w-80 border border-dach-line bg-white px-5 py-4 outline-none focus:border-dach-orange" placeholder="Search name or postcode..." />
         </div>
-        <div class="grid h-[520px] place-items-center text-center text-dach-muted">
-          <p><FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl" /><br />No quote requests yet.<br />They'll appear here when customers fill in the form on your website.</p>
+        <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
+          <table v-if="filteredQuotes.length" class="w-full text-left text-sm">
+            <thead class="bg-[#151515] text-white">
+              <tr>
+                <th class="px-5 py-4 font-semibold">Customer</th>
+                <th class="px-5 py-4 font-semibold">Route</th>
+                <th class="px-5 py-4 font-semibold">Service</th>
+                <th class="px-5 py-4 font-semibold">Date</th>
+                <th class="px-5 py-4 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-dach-line">
+              <tr v-for="quote in filteredQuotes" :key="quote.id" class="hover:bg-dach-cream/60">
+                <td class="px-5 py-4">
+                  <p class="font-semibold">{{ quote.fullName || 'Website Visitor' }}</p>
+                  <p class="text-dach-muted">{{ quote.phoneNumber || quote.emailAddress || 'No contact supplied' }}</p>
+                </td>
+                <td class="px-5 py-4">{{ quote.pickupPostcode || '-' }} -> {{ quote.deliveryPostcode || '-' }}</td>
+                <td class="px-5 py-4">{{ quote.serviceType || '-' }}</td>
+                <td class="px-5 py-4">{{ quote.preferredDate || 'Flexible' }}</td>
+                <td class="px-5 py-4"><span class="bg-dach-orange/10 px-3 py-1 text-xs font-bold uppercase text-dach-orange">{{ quote.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-else class="grid h-[440px] place-items-center text-center text-dach-muted">
+            <p><FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl text-dach-orange/70" /><br />No quote requests yet.<br />They will appear here when customers submit the form.</p>
+          </div>
         </div>
       </section>
 
       <section v-if="activeAdminView === 'bookings'" class="p-9">
-        <div class="mb-8 flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <button class="border bg-white px-4 py-3">&lt;</button>
-            <h2 class="display-title text-2xl font-extrabold">September 2026</h2>
-            <button class="border bg-white px-4 py-3">&gt;</button>
+        <div class="mb-6 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button class="border border-dach-line bg-white px-4 py-3" type="button">&lt;</button>
+            <h2 class="font-google-sans text-2xl font-bold">September 2026</h2>
+            <button class="border border-dach-line bg-white px-4 py-3" type="button">&gt;</button>
           </div>
-          <button class="bg-dach-orange px-6 py-4 font-black text-white"><FontAwesomeIcon icon="plus" /> Add Booking</button>
+          <button class="bg-dach-orange px-5 py-4 font-semibold text-white" type="button"><FontAwesomeIcon icon="plus" class="mr-2" />Add Booking</button>
         </div>
-        <div class="grid grid-cols-7 text-center text-sm font-bold text-dach-muted">
-          <span v-for="day in calendarDays" :key="day">{{ day }}</span>
-        </div>
-        <div class="mt-4 grid grid-cols-7">
-          <div v-for="cell in calendarCells" :key="cell" class="h-28 border border-dach-line bg-white p-3" :class="cell === '7' ? 'border-dach-orange text-dach-orange' : ''">
-            {{ cell }}
+        <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
+          <div class="grid grid-cols-7 border-b border-dach-line bg-[#151515] text-center text-xs font-bold uppercase tracking-[0.14em] text-white">
+            <span v-for="day in calendarDays" :key="day" class="py-4">{{ day }}</span>
+          </div>
+          <div class="grid grid-cols-7">
+            <div v-for="cell in calendarCells" :key="cell" class="min-h-28 border-r border-t border-dach-line p-3 text-sm" :class="cell === '7' ? 'bg-dach-orange/5 ring-1 ring-inset ring-dach-orange text-dach-orange' : 'bg-white'">
+              <span class="font-semibold">{{ cell }}</span>
+              <p v-if="cell === '7' && confirmedBookings.length" class="mt-3 bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">{{ confirmedBookings[0].customerName }}</p>
+            </div>
           </div>
         </div>
-        <p class="mt-5 text-dach-muted"><span class="text-dach-orange">■</span> New <span class="ml-6 text-green-600">■</span> Confirmed</p>
+        <p class="mt-5 text-sm text-dach-muted"><span class="text-dach-orange">■</span> New <span class="ml-6 text-green-600">■</span> Confirmed</p>
       </section>
 
       <section v-if="activeAdminView === 'messages'" class="p-9">
-        <h2 class="display-title mb-6 text-2xl font-extrabold">Customer Messages</h2>
-        <div class="grid min-h-[620px] grid-cols-[360px_1fr] border border-dach-line bg-white">
-          <div class="grid place-items-start border-r border-dach-line p-20 text-center text-dach-muted">
-            <FontAwesomeIcon icon="envelope" class="mb-4 text-4xl" />No messages yet
+        <div class="mb-6 flex items-end justify-between">
+          <div>
+            <h2 class="font-google-sans text-2xl font-bold">Customer Messages</h2>
+            <p class="mt-1 text-dach-muted">{{ unreadMessages.length }} unread</p>
           </div>
-          <div class="grid place-items-center text-dach-muted">Select a message to read</div>
+        </div>
+        <div class="grid min-h-[620px] grid-cols-[380px_1fr] overflow-hidden border border-dach-line bg-white shadow-sm">
+          <div class="border-r border-dach-line">
+            <div v-if="messages.length" class="divide-y divide-dach-line">
+              <button v-for="message in messages" :key="message.id" class="block w-full p-5 text-left hover:bg-dach-cream/60" type="button">
+                <p class="font-semibold">{{ message.senderName }}</p>
+                <p class="mt-1 text-sm text-dach-muted">{{ message.subject }}</p>
+              </button>
+            </div>
+            <div v-else class="grid h-full place-items-center p-12 text-center text-dach-muted">
+              <p><FontAwesomeIcon icon="envelope" class="mb-4 text-4xl text-dach-orange/70" /><br />No messages yet</p>
+            </div>
+          </div>
+          <div class="grid place-items-center p-10 text-center text-dach-muted">
+            <div>
+              <FontAwesomeIcon icon="eye" class="mb-4 text-4xl text-dach-orange/70" />
+              <p>Select a message to read</p>
+            </div>
+          </div>
         </div>
       </section>
 
       <section v-if="activeAdminView === 'content'" class="p-9">
-        <h2 class="display-title mb-6 text-2xl font-extrabold">Edit Website Content</h2>
-        <div class="grid grid-cols-[280px_1fr] gap-8">
-          <div class="border border-dach-line bg-white">
-            <button v-for="item in editableSections" :key="item.label" class="block w-full border-b border-dach-line p-6 text-left">
+        <h2 class="mb-6 font-google-sans text-2xl font-bold">Edit Website Content</h2>
+        <div class="grid grid-cols-[300px_1fr] gap-6">
+          <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
+            <button
+              v-for="item in contentSections.length ? contentSections : editableSections.map((item) => ({ id: item.label.toLowerCase().replaceAll(' ', '-'), label: item.label, fields: {} }))"
+              :key="item.label"
+              class="block w-full border-b border-dach-line p-5 text-left transition hover:bg-dach-cream/60"
+              :class="selectedContent === item.id ? 'bg-dach-orange text-white hover:bg-dach-orange' : ''"
+              type="button"
+              @click="selectedContent = item.id"
+            >
               <strong>{{ item.label }}</strong>
-              <span class="block text-sm text-dach-muted">{{ item.fields }} fields</span>
+              <span class="mt-1 block text-sm" :class="selectedContent === item.id ? 'text-white/70' : 'text-dach-muted'">{{ Object.keys(item.fields || {}).length || 0 }} fields</span>
             </button>
           </div>
-          <div class="min-h-56 border border-dach-line bg-white p-8 text-dach-muted">Select a section on the left to edit</div>
+          <div class="min-h-72 border border-dach-line bg-white p-7 shadow-sm">
+            <template v-if="selectedContentSection">
+              <div class="mb-6 flex items-center justify-between border-b border-dach-line pb-5">
+                <h3 class="font-google-sans text-xl font-bold">{{ selectedContentSection.label }}</h3>
+                <button class="bg-dach-orange px-4 py-3 text-sm font-semibold text-white" type="button">Save Changes</button>
+              </div>
+              <label v-for="(value, key) in selectedContentSection.fields" :key="key" class="mb-5 block">
+                <span class="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-dach-muted">{{ key }}</span>
+                <textarea class="min-h-24 w-full border border-dach-line bg-dach-cream px-4 py-3 outline-none focus:border-dach-orange" :value="value" />
+              </label>
+            </template>
+            <p v-else class="text-dach-muted">Select a section on the left to edit.</p>
+          </div>
         </div>
       </section>
     </main>
