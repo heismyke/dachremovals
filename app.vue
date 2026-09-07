@@ -166,7 +166,7 @@ async function loadAdminData() {
     messages.value = messageData
     contentSections.value = contentData
   } catch (error) {
-    adminError.value = 'Showing saved admin view. Live data will appear when the engine is connected.'
+    adminError.value = 'Showing saved admin view. New records will appear when the engine is connected.'
   } finally {
     adminLoading.value = false
   }
@@ -519,7 +519,7 @@ async function loginAdmin() {
             <button class="border border-dach-line bg-white px-4 py-3 text-sm font-semibold text-dach-muted" type="button" @click="loadAdminData">
               <FontAwesomeIcon icon="rotate-right" class="mr-2 text-dach-orange" />Refresh
             </button>
-            <p class="text-sm text-dach-muted">Mon, 7 September 2026 <span class="ml-3 font-semibold text-green-600">Live</span></p>
+            <p class="text-sm text-dach-muted">Mon, 7 September 2026</p>
           </div>
         </div>
         <div v-if="adminError" class="mt-4 flex items-center gap-3 border border-dach-line bg-[#faf7f4] px-4 py-3 text-sm font-medium text-dach-muted">
