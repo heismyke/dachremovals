@@ -166,7 +166,7 @@ async function loadAdminData() {
     messages.value = messageData
     contentSections.value = contentData
   } catch (error) {
-    adminError.value = 'Backend is offline. Start dachremovals-engine on port 8080.'
+    adminError.value = 'Showing saved admin view. Live data will appear when the engine is connected.'
   } finally {
     adminLoading.value = false
   }
@@ -522,7 +522,10 @@ async function loginAdmin() {
             <p class="text-sm text-dach-muted">Mon, 7 September 2026 <span class="ml-3 font-semibold text-green-600">Live</span></p>
           </div>
         </div>
-        <p v-if="adminError" class="mt-4 border border-dach-orange/25 bg-dach-orange/10 px-4 py-3 text-sm font-semibold text-dach-orange">{{ adminError }}</p>
+        <div v-if="adminError" class="mt-4 flex items-center gap-3 border border-dach-line bg-[#faf7f4] px-4 py-3 text-sm font-medium text-dach-muted">
+          <span class="grid h-7 w-7 place-items-center bg-white text-dach-orange"><FontAwesomeIcon icon="clock" /></span>
+          <span>{{ adminError }}</span>
+        </div>
       </header>
 
       <section v-if="activeAdminView === 'dashboard'" class="p-9">
