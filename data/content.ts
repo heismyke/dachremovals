@@ -1,6 +1,6 @@
 export const brand = {
   name: 'Dach Removals',
-  phone: '020 3129 6180',
+  phone: '+44 7424 849252',
   mobile: '+44 7424 849252',
   email: 'info@dachremovals.co.uk',
 }
