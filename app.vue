@@ -567,20 +567,49 @@ async function loginAdmin() {
     </footer>
   </main>
 
-  <div v-else-if="activeAdminView === 'login'" class="grid min-h-screen place-items-center bg-dach-black">
-    <form class="w-[420px] border-t-4 border-dach-orange bg-white p-12 shadow-2xl" @submit.prevent="loginAdmin">
-      <img src="/images/logo.jpg" alt="Dach Removals" class="mb-8 h-14 w-auto object-contain" />
-      <p class="mb-8 text-sm font-bold uppercase tracking-[0.25em] text-dach-muted">Admin Portal</p>
-      <label class="text-xs font-bold uppercase tracking-[0.2em] text-dach-muted">Username</label>
-      <input v-model="adminLogin.username" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
-      <label class="mt-5 block text-xs font-bold uppercase tracking-[0.2em] text-dach-muted">Password</label>
-      <input v-model="adminLogin.password" type="password" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
-      <button class="mt-6 block w-full bg-dach-orange px-6 py-4 text-center font-black uppercase text-white" type="submit">
-        Sign In <FontAwesomeIcon icon="arrow-right" />
-      </button>
-      <p v-if="loginError" class="mt-4 text-sm font-semibold text-dach-orange">{{ loginError }}</p>
-      <a href="/" class="mt-8 block text-center text-sm text-dach-muted"><FontAwesomeIcon icon="arrow-left" /> Back to website</a>
-    </form>
+  <div v-else-if="activeAdminView === 'login'" class="relative isolate min-h-screen overflow-hidden bg-dach-black text-white">
+    <img src="/images/hero-removals-2.png" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover opacity-70" />
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-dach-black via-dach-black/80 to-dach-black/45" />
+    <div class="abstract-grid absolute inset-0 -z-10 opacity-20" />
+    <span class="corner-mark left-16 top-16 border-white/20" />
+
+    <div class="mx-auto grid min-h-screen w-full max-w-6xl items-center gap-12 px-6 py-12 lg:grid-cols-[1fr_440px]">
+      <Motion
+        as="section"
+        class="max-w-xl"
+        :initial="{ opacity: 0, x: -28 }"
+        :animate="{ opacity: 1, x: 0 }"
+        :transition="{ duration: 0.55, ease: 'easeOut' }"
+      >
+        <img src="/images/logo.jpg" alt="Dach Removals" class="h-14 w-auto rounded-xl bg-white object-contain" />
+        <p class="mt-8 text-sm font-semibold uppercase tracking-[0.18em] text-dach-orange">Operations Portal</p>
+        <h1 class="mt-4 max-w-lg text-5xl font-bold leading-tight">Manage quotes, bookings, and move-day work.</h1>
+        <p class="mt-5 max-w-lg text-lg leading-8 text-white/70">For the Dach Removals team only. Keep customer requests, schedules, and dispatch notes organised.</p>
+      </Motion>
+
+      <Motion
+        as="form"
+        class="rounded-3xl border border-white/18 bg-white/12 p-8 shadow-2xl shadow-black/40 backdrop-blur-xl"
+        :initial="{ opacity: 0, y: 28 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
+        @submit.prevent="loginAdmin"
+      >
+        <div class="mb-8">
+          <p class="text-sm font-semibold text-white/60">Secure sign in</p>
+          <h2 class="mt-2 font-google-sans text-3xl font-bold">Admin access</h2>
+        </div>
+        <label class="text-xs font-bold uppercase tracking-[0.18em] text-white/55">Username</label>
+        <input v-model="adminLogin.username" class="mt-2 w-full rounded-2xl border border-white/14 bg-white/14 px-5 py-4 text-white outline-none placeholder:text-white/45 focus:border-dach-orange" />
+        <label class="mt-5 block text-xs font-bold uppercase tracking-[0.18em] text-white/55">Password</label>
+        <input v-model="adminLogin.password" type="password" class="mt-2 w-full rounded-2xl border border-white/14 bg-white/14 px-5 py-4 text-white outline-none placeholder:text-white/45 focus:border-dach-orange" />
+        <button class="mt-6 block w-full rounded-full bg-dach-orange px-6 py-4 text-center font-bold text-white transition hover:bg-white hover:text-dach-black" type="submit">
+          Sign In <FontAwesomeIcon icon="arrow-right" class="ml-2" />
+        </button>
+        <p v-if="loginError" class="mt-4 rounded-2xl bg-dach-orange/15 px-4 py-3 text-sm font-semibold text-white">{{ loginError }}</p>
+        <a href="/" class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-white/60 transition hover:text-white"><FontAwesomeIcon icon="arrow-left" /> Back to website</a>
+      </Motion>
+    </div>
   </div>
 
   <div v-else class="grid min-h-screen grid-cols-[288px_1fr] bg-[#f7f3ef] text-dach-black">
