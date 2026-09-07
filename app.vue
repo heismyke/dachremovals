@@ -4,7 +4,6 @@ import { adminNavItems, calendarCells, calendarDays, dashboardCards, editableSec
 import { areas, brand, faqs, navigation, quoteSteps, routePairs, services, trustBadges } from './data/content'
 
 const route = useRoute()
-const featuredServices = services.slice(0, 2)
 const openFaq = ref(0)
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const activeAdminView = computed(() => {
@@ -140,36 +139,25 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <section id="services" class="border-y border-dach-line bg-dach-cream py-24">
+    <section id="services" class="border-y border-dach-line bg-white py-20">
       <div class="section-wrap">
-        <div class="grid gap-6 lg:grid-cols-[0.7fr_1fr] lg:items-end">
+        <div class="grid gap-4 lg:grid-cols-[0.7fr_1fr] lg:items-end">
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Services.</h2>
-          <p class="text-lg leading-8 text-dach-muted">Home, office, student, furniture, packing, and storage moves.</p>
+          <p class="max-w-xl text-lg leading-8 text-dach-muted">Home, office, student, furniture, packing, and storage moves.</p>
         </div>
 
-        <div class="mt-12 grid gap-6 lg:grid-cols-2">
-          <article v-for="service in featuredServices" :key="service.title" class="bg-white shadow-sm">
-            <img :src="service.image" :alt="service.title" class="h-64 w-full object-cover" />
-            <div class="p-7">
-              <h3 class="text-2xl font-bold">{{ service.title }}</h3>
-              <p class="mt-3 leading-7 text-dach-muted">{{ service.description }}</p>
-              <ul class="mt-5 grid gap-2 text-sm text-dach-muted">
-                <li v-for="item in service.idealFor" :key="item"><FontAwesomeIcon icon="check" class="mr-2 text-dach-orange" />{{ item }}</li>
+        <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <article v-for="(service, index) in services" :key="service.title" class="border border-dach-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100">
+            <img v-if="index < 2" :src="service.image" :alt="service.title" class="h-44 w-full object-cover" />
+            <div class="p-6">
+              <span class="mb-5 flex h-11 w-11 items-center justify-center bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
+              <h3 class="text-xl font-bold">{{ service.title }}</h3>
+              <p class="mt-3 min-h-14 leading-7 text-dach-muted">{{ service.description }}</p>
+              <ul v-if="index < 2" class="mt-4 grid gap-2 text-sm text-dach-muted">
+                <li v-for="item in service.idealFor.slice(0, 3)" :key="item"><FontAwesomeIcon icon="check" class="mr-2 text-dach-orange" />{{ item }}</li>
               </ul>
-              <div class="mt-6 flex gap-3">
-                <a href="#quote" class="bg-dach-orange px-5 py-3 font-semibold text-white">Get Quote</a>
-                <a href="#faq" class="border border-dach-line px-5 py-3 font-semibold">Learn More</a>
-              </div>
+              <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
             </div>
-          </article>
-        </div>
-
-        <div class="mt-8 grid gap-5 md:grid-cols-3">
-          <article v-for="service in services.slice(2)" :key="service.title" class="bg-white p-7 shadow-sm">
-            <span class="mb-6 flex h-11 w-11 items-center justify-center bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
-            <h3 class="text-xl font-bold">{{ service.title }}</h3>
-            <p class="mt-3 leading-7 text-dach-muted">{{ service.description }}</p>
-            <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
           </article>
         </div>
       </div>
