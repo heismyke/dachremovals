@@ -284,8 +284,11 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <footer class="bg-[#101010] py-14 text-white">
-      <div class="section-wrap grid gap-10 md:grid-cols-4">
+    <footer class="relative overflow-hidden bg-[#101010] py-16 text-white">
+      <img src="/images/hero-removals.png" alt="" class="absolute inset-0 h-full w-full object-cover opacity-20" />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#101010] via-[#101010]/92 to-[#101010]/78" />
+      <div class="absolute inset-0 bg-dach-black/55" />
+      <div class="section-wrap relative grid gap-10 md:grid-cols-4">
         <div>
           <div class="mb-5 flex items-center gap-3">
             <span class="grid h-10 w-10 place-items-center bg-dach-orange font-black text-dach-black">D</span>
