@@ -42,12 +42,8 @@ onBeforeUnmount(() => {
   <main v-if="!isAdminRoute" class="min-h-screen bg-white text-dach-black">
     <header class="sticky top-0 z-50 border-b border-dach-line bg-white/95 backdrop-blur">
       <div class="section-wrap flex h-20 items-center justify-between">
-        <a href="#" class="flex items-center gap-3">
-          <span class="grid h-11 w-11 place-items-center bg-dach-orange text-xl font-black text-dach-black">D</span>
-          <span class="leading-none">
-            <span class="display-title block text-xl font-extrabold">ACH</span>
-            <span class="block text-[10px] font-bold uppercase tracking-[0.42em] text-dach-orange">Removals</span>
-          </span>
+        <a href="#" class="flex items-center">
+          <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto object-contain" />
         </a>
 
         <nav class="hidden items-center gap-8 text-sm font-semibold lg:flex">
@@ -258,13 +254,7 @@ onBeforeUnmount(() => {
       <div class="absolute inset-0 bg-dach-black/55" />
       <div class="section-wrap relative grid gap-10 md:grid-cols-4">
         <div>
-          <div class="mb-5 flex items-center gap-3">
-            <span class="grid h-10 w-10 place-items-center bg-dach-orange font-black text-dach-black">D</span>
-            <span>
-              <span class="block text-lg font-extrabold">ACH</span>
-              <span class="block text-[10px] font-bold uppercase tracking-[0.35em] text-dach-orange">Removals</span>
-            </span>
-          </div>
+          <img src="/images/logo.jpg" alt="Dach Removals" class="mb-5 h-12 w-auto bg-white object-contain" />
           <p class="text-white/60">UK removals. Clear pricing. Careful crews.</p>
         </div>
         <div>
@@ -290,13 +280,7 @@ onBeforeUnmount(() => {
 
   <div v-else-if="activeAdminView === 'login'" class="grid min-h-screen place-items-center bg-dach-black">
     <form class="w-[420px] border-t-4 border-dach-orange bg-white p-12 shadow-2xl">
-      <div class="mb-8 flex items-center gap-3">
-        <span class="grid h-12 w-12 place-items-center bg-dach-orange text-2xl font-black">D</span>
-        <span>
-          <span class="display-title block text-2xl font-extrabold">ACH</span>
-          <span class="block text-[10px] font-bold uppercase tracking-[0.45em] text-dach-orange">Removals</span>
-        </span>
-      </div>
+      <img src="/images/logo.jpg" alt="Dach Removals" class="mb-8 h-14 w-auto object-contain" />
       <p class="mb-8 text-sm font-bold uppercase tracking-[0.25em] text-dach-muted">Admin Portal</p>
       <label class="text-xs font-bold uppercase tracking-[0.2em] text-dach-muted">Username</label>
       <input value="admin" class="mt-2 w-full border border-dach-line bg-dach-cream px-5 py-4 outline-none" />
@@ -311,13 +295,9 @@ onBeforeUnmount(() => {
 
   <div v-else class="grid min-h-screen grid-cols-[300px_1fr] bg-dach-cream">
     <aside class="flex flex-col bg-dach-black text-white">
-      <div class="flex h-28 items-center gap-3 border-b border-white/10 px-7">
-        <span class="grid h-12 w-12 place-items-center bg-dach-orange text-2xl font-black text-dach-black">D</span>
-        <span>
-          <span class="display-title block text-2xl font-extrabold">ACH</span>
-          <span class="block text-[10px] font-bold uppercase tracking-[0.45em] text-dach-orange">Removals</span>
-          <span class="block text-[11px] uppercase tracking-[0.25em] text-white/40">Admin Panel</span>
-        </span>
+      <div class="flex h-28 flex-col items-start justify-center border-b border-white/10 px-7">
+        <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto bg-white object-contain" />
+        <span class="mt-2 text-[11px] uppercase tracking-[0.25em] text-white/40">Admin Panel</span>
       </div>
 
       <nav class="mt-4">
