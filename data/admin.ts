@@ -1,5 +1,5 @@
 export const adminNavItems = [
-  { label: 'Dashboard', icon: 'bolt', path: '/admin/dashboard' },
+  { label: 'Dashboard', icon: 'gauge-high', path: '/admin/dashboard' },
   { label: 'Quote Requests', icon: 'clipboard', path: '/admin/quotes', badge: 0 },
   { label: 'Bookings', icon: 'calendar-days', path: '/admin/bookings' },
   { label: 'Messages', icon: 'envelope', path: '/admin/messages', badge: 0 },
