@@ -36,8 +36,8 @@ const activeAdminView = computed(() => {
     <NuxtPage />
   </div>
 
-  <main v-if="!isAdminRoute" class="mx-auto min-h-screen max-w-[1560px] overflow-hidden rounded-[24px] bg-white shadow-2xl shadow-orange-200/40">
-    <nav class="sticky top-0 z-50 flex h-24 items-center justify-between border-b border-dach-line bg-white/95 px-8 backdrop-blur">
+  <main v-if="!isAdminRoute" class="mx-auto min-h-screen max-w-[1760px] overflow-hidden rounded-[28px] bg-white shadow-2xl shadow-orange-200/40">
+    <nav class="sticky top-0 z-50 flex h-24 items-center justify-between border-b border-dach-line bg-white/95 px-8 backdrop-blur xl:px-12">
       <a href="#" class="flex items-center gap-3">
         <span class="grid h-12 w-12 place-items-center bg-dach-orange text-2xl font-black text-dach-black">D</span>
         <span class="leading-none">
@@ -53,54 +53,59 @@ const activeAdminView = computed(() => {
       </div>
 
       <div class="flex items-center gap-3">
-        <a :href="`tel:${brand.phone}`" class="hidden items-center gap-2 rounded-xl bg-dach-cream px-5 py-4 text-sm font-bold md:flex">
+        <a :href="`tel:${brand.phone}`" class="hidden items-center gap-3 rounded-2xl bg-dach-cream px-6 py-4 text-sm font-black shadow-sm md:flex">
           <FontAwesomeIcon icon="phone" />
           {{ brand.phone }}
         </a>
-        <a href="/admin" class="rounded-xl bg-dach-orange px-6 py-4 text-sm font-bold text-white">Log In</a>
+        <a href="/admin" class="rounded-2xl bg-dach-orange px-7 py-4 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5">Log In</a>
       </div>
     </nav>
 
-    <section class="relative min-h-[760px] overflow-hidden">
+    <section class="relative min-h-[820px] overflow-hidden">
       <img
-        src="https://images.unsplash.com/photo-1600518464441-9306b65d6d3c?auto=format&fit=crop&w=2200&q=85"
+        src="/images/hero-removals.png"
         alt="Dach Removals crew loading a van"
         class="absolute inset-0 h-full w-full object-cover"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-dach-black via-dach-black/35 to-transparent" />
+      <div class="absolute inset-0 bg-gradient-to-r from-dach-black/95 via-dach-black/55 to-dach-black/10" />
+      <div class="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-dach-black/90 to-transparent" />
 
-      <div class="relative z-10 grid min-h-[760px] items-end gap-10 px-10 pb-20 lg:grid-cols-[1.1fr_0.9fr]">
+      <div class="relative z-10 grid min-h-[820px] items-end gap-12 px-8 pb-24 pt-16 md:px-12 lg:grid-cols-[1.05fr_0.95fr] xl:px-16">
         <Motion
           as="div"
-          class="max-w-3xl text-white"
+          class="max-w-4xl pb-4 text-white"
           :initial="{ opacity: 0, y: 28 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.65, ease: 'easeOut' }"
         >
-          <div class="mb-7 flex flex-wrap gap-3">
-            <span class="rounded-xl bg-dach-black/70 px-4 py-2 text-sm"><FontAwesomeIcon icon="star" class="mr-2 text-dach-orange" />4.8/5</span>
-            <span class="rounded-xl bg-dach-black/70 px-4 py-2 text-sm">BAR Registered</span>
-            <span class="rounded-xl bg-dach-black/70 px-4 py-2 text-sm"><FontAwesomeIcon icon="shield-halved" class="mr-2" />Fully Insured</span>
-            <span class="rounded-xl bg-dach-black/70 px-4 py-2 text-sm">UK-Wide</span>
+          <div class="mb-8 flex flex-wrap gap-3">
+            <span class="rounded-2xl bg-white/14 px-4 py-2.5 text-sm font-bold backdrop-blur"><FontAwesomeIcon icon="star" class="mr-2 text-dach-orange" />4.8/5</span>
+            <span class="rounded-2xl bg-white/14 px-4 py-2.5 text-sm font-bold backdrop-blur">BAR Registered</span>
+            <span class="rounded-2xl bg-white/14 px-4 py-2.5 text-sm font-bold backdrop-blur"><FontAwesomeIcon icon="shield-halved" class="mr-2" />Fully Insured</span>
+            <span class="rounded-2xl bg-white/14 px-4 py-2.5 text-sm font-bold backdrop-blur">UK-Wide</span>
           </div>
-          <h1 class="display-title text-6xl leading-[0.95] md:text-8xl">
-            Dach Removals - UK<br />Moving, <span class="text-dach-orange">Simplified!</span>
+          <h1 class="display-title max-w-[780px] text-6xl leading-[0.9] text-white md:text-8xl xl:text-[112px]">
+            UK Removals,<br /><span class="text-dach-orange">Done Right.</span>
           </h1>
-          <p class="mt-7 max-w-xl text-xl text-white/90">
-            Moving home? Need a man with van? Looking for removal companies near me? Dach Removals makes it happen in 60 seconds.
+          <p class="mt-7 max-w-2xl text-xl leading-8 text-white/88">
+            Moving home? Need a man with van? Dach Removals gives you fast quotes, careful crews, and UK-wide moving support without the usual waiting around.
           </p>
+          <div class="mt-9 flex flex-wrap gap-4">
+            <a href="#quote" class="rounded-2xl bg-dach-orange px-7 py-4 font-black text-white shadow-xl shadow-orange-500/20">Get Your Instant Quote <FontAwesomeIcon icon="arrow-right" class="ml-2" /></a>
+            <a :href="`tel:${brand.phone}`" class="rounded-2xl bg-white/12 px-7 py-4 font-black text-white ring-1 ring-white/25 backdrop-blur"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
+          </div>
         </Motion>
 
         <Motion
           id="quote"
           as="form"
-          class="rounded-[28px] bg-white p-7 shadow-2xl lg:mb-[-120px]"
+          class="w-full max-w-[560px] justify-self-end rounded-[32px] bg-white p-7 shadow-2xl shadow-black/25 md:p-9 lg:mb-[-96px]"
           :initial="{ opacity: 0, y: 34, scale: 0.97 }"
           :animate="{ opacity: 1, y: 0, scale: 1 }"
           :transition="{ duration: 0.7, ease: 'easeOut', delay: 0.12 }"
         >
-          <h2 class="text-2xl font-black">Get Your Price Instantly</h2>
-          <p class="mt-2 text-sm text-dach-muted">No phone calls. No waiting. Instant fixed price.</p>
+          <h2 class="text-3xl font-black tracking-tight">Get Your Price Instantly</h2>
+          <p class="mt-2 text-base text-dach-muted">No phone calls. No waiting. Instant fixed price.</p>
           <label class="mt-6 block text-sm font-bold">Moving From</label>
           <div class="mt-2 flex items-center gap-3 rounded-xl bg-dach-cream px-4 py-4 text-dach-muted">
             <FontAwesomeIcon icon="location-dot" />
@@ -119,7 +124,7 @@ const activeAdminView = computed(() => {
             </select>
             <input class="rounded-xl bg-dach-cream px-4 py-4 text-dach-muted outline-none" placeholder="dd/mm/yyyy" />
           </div>
-          <button class="mt-6 w-full rounded-xl bg-dach-orange px-6 py-5 font-black text-white transition hover:-translate-y-1">
+          <button class="mt-6 w-full rounded-2xl bg-dach-orange px-6 py-5 font-black text-white shadow-lg shadow-orange-200 transition hover:-translate-y-1">
             See Price Instantly <FontAwesomeIcon icon="arrow-right" class="ml-2" />
           </button>
           <div class="mt-4 grid grid-cols-2 gap-3">
@@ -131,7 +136,7 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <section id="how-it-works" class="px-10 py-24">
+    <section id="how-it-works" class="px-8 py-28 md:px-12 xl:px-16">
       <span class="rounded-xl border border-dach-orange/30 bg-orange-50 px-4 py-2 text-sm font-semibold text-dach-orange">Mobile Exclusive</span>
       <h2 class="mt-6 text-5xl font-black tracking-tight text-dach-black">Get Your Quote in <em class="font-normal text-dach-orange">60 Seconds</em></h2>
       <p class="mt-5 max-w-2xl text-lg text-dach-muted">Traditional removal companies make you wait. Phone calls. Callbacks. Home visits. Days before you get a price.</p>

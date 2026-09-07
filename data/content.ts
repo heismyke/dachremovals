@@ -37,8 +37,7 @@ export const services = [
   {
     icon: 'van-shuttle',
     title: 'Man and Van',
-    image:
-      'https://images.unsplash.com/photo-1600518464441-9306b65d6d3c?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/hero-removals.png',
     description: 'Our most popular service. Perfect for smaller moves, single items, and flexible jobs.',
     idealFor: ['Studio and 1-bed flat moves', 'Single furniture items', 'Student moves between term times', 'eBay and Gumtree purchases', 'Small office moves'],
     detail: 'One professional driver with a fully-equipped van. Loading and unloading included. Basic insurance as standard.',
@@ -46,8 +45,7 @@ export const services = [
   {
     icon: 'house',
     title: 'House Removals',
-    image:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/hero-removals.png',
     description: "Full home removals with professional crews. We handle everything so you don't have to stress.",
     idealFor: ['2-bed flats and houses', '3-bed family homes', '4+ bed properties', 'Properties with difficult access', 'Long-distance house moves'],
     detail: 'Teams of 2-4 professional movers depending on your needs. Larger vehicles for bigger properties. Full protection for your belongings.',
