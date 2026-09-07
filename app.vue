@@ -231,14 +231,14 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <section class="relative overflow-hidden bg-dach-cream py-24">
-      <img src="/images/hero-removals.png" alt="" class="absolute inset-0 h-full w-full object-cover opacity-16" />
-      <div class="absolute inset-0 bg-gradient-to-r from-dach-cream via-dach-cream/94 to-white/88" />
-      <div class="absolute inset-0 bg-white/35" />
+    <section class="relative overflow-hidden py-24 text-white">
+      <img src="/images/hero-removals.png" alt="" class="absolute inset-0 h-full w-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-r from-dach-black/88 via-dach-black/72 to-dach-black/48" />
+      <div class="absolute inset-0 bg-dach-black/20" />
       <div class="section-wrap relative">
         <h2 class="max-w-2xl text-4xl font-bold tracking-tight md:text-5xl">Helpful moving resources.</h2>
         <div class="mt-10 grid gap-5 md:grid-cols-3">
-          <article v-for="[icon, title, copy] in resources" :key="title" class="bg-white p-6 shadow-sm">
+          <article v-for="[icon, title, copy] in resources" :key="title" class="bg-white/95 p-6 text-dach-black shadow-xl shadow-black/20 backdrop-blur">
             <div class="mb-6 flex items-center justify-between border-b border-dach-line pb-6">
               <span class="flex h-12 w-12 items-center justify-center bg-dach-orange text-white">
                 <FontAwesomeIcon :icon="icon" />
