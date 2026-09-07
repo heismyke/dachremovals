@@ -175,14 +175,6 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <section class="section-wrap py-16">
-      <div class="grid gap-4 md:grid-cols-4">
-        <article v-for="badge in trustBadges" :key="badge" class="border border-dach-line p-6 text-center font-sf-mono font-semibold">
-          {{ badge }}
-        </article>
-      </div>
-    </section>
-
     <section id="areas" class="border-y border-dach-line bg-gray-50 py-24">
       <div class="section-wrap grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
         <div>
