@@ -22,6 +22,20 @@ const quoteForm = reactive({
   serviceType: 'House Move',
   preferredDate: '',
 })
+const showBookingModal = ref(false)
+const bookingSaving = ref(false)
+const bookingError = ref('')
+const bookingForm = reactive({
+  quoteRequestId: '',
+  customerName: '',
+  phoneNumber: '',
+  serviceType: 'House Move',
+  pickupPostcode: '',
+  deliveryPostcode: '',
+  bookingDate: '2026-09-07',
+  status: 'confirmed',
+  notes: '',
+})
 const heroSlides = [
   { title: 'House removals', image: '/images/hero-removals.png', position: 'object-center' },
   { title: 'Man and van', image: '/images/hero-removals-2.png', position: 'object-center' },
@@ -127,6 +141,20 @@ const filteredQuotes = computed(() => {
 const unreadMessages = computed(() => messages.value.filter((message) => !message.isRead))
 const confirmedBookings = computed(() => bookings.value.filter((booking) => booking.status === 'confirmed'))
 const nextBooking = computed(() => bookings.value.find((booking) => booking.bookingDate) || bookings.value[0])
+const bookingsByCalendarDay = computed(() => {
+  return bookings.value.reduce<Record<string, Booking[]>>((days, booking) => {
+    const day = booking.bookingDate?.slice(0, 10) === '2026-09-01'
+      ? '1'
+      : booking.bookingDate?.startsWith('2026-09-')
+        ? String(Number(booking.bookingDate.slice(8, 10)))
+        : ''
+    if (day) {
+      days[day] = [...(days[day] || []), booking]
+    }
+    return days
+  }, {})
+})
+const todaysJobs = computed(() => bookingsByCalendarDay.value['7'] || [])
 const dashboardStats = computed(() => [
   {
     label: 'New Quotes',
@@ -201,12 +229,31 @@ async function loadAdminData() {
       selectedContent.value = availableContentSections.value[0]?.id || 'business-profile'
     }
   } catch (error) {
+    loadLocalAdminData()
     if (!contentSections.value.length) {
       contentSections.value = fallbackContentSections
     }
   } finally {
     adminLoading.value = false
   }
+}
+
+function loadLocalAdminData() {
+  if (!import.meta.client) return
+  const savedBookings = window.localStorage.getItem('dach-admin-bookings')
+  if (savedBookings) {
+    bookings.value = JSON.parse(savedBookings)
+  }
+}
+
+function saveLocalBookings() {
+  if (!import.meta.client) return
+  window.localStorage.setItem('dach-admin-bookings', JSON.stringify(bookings.value))
+}
+
+function calendarCellBookings(cell: string, index: number) {
+  if (index < 1 || index > 30) return []
+  return bookingsByCalendarDay.value[cell] || []
 }
 
 async function submitQuote() {
@@ -227,6 +274,53 @@ async function submitQuote() {
   quoteForm.pickupPostcode = ''
   quoteForm.deliveryPostcode = ''
   quoteForm.preferredDate = ''
+}
+
+function openBookingForm(quote?: QuoteRequest) {
+  bookingError.value = ''
+  bookingForm.quoteRequestId = quote?.id || ''
+  bookingForm.customerName = quote?.fullName || ''
+  bookingForm.phoneNumber = quote?.phoneNumber || ''
+  bookingForm.serviceType = quote?.serviceType || 'House Move'
+  bookingForm.pickupPostcode = quote?.pickupPostcode || ''
+  bookingForm.deliveryPostcode = quote?.deliveryPostcode || ''
+  bookingForm.bookingDate = quote?.preferredDate?.match(/^\d{4}-\d{2}-\d{2}$/) ? quote.preferredDate : '2026-09-07'
+  bookingForm.status = 'confirmed'
+  bookingForm.notes = quote?.additionalNotes || ''
+  showBookingModal.value = true
+}
+
+async function createBooking() {
+  bookingSaving.value = true
+  bookingError.value = ''
+  try {
+    const created = await $fetch<Booking>(`${apiBase.value}/api/bookings`, {
+      method: 'POST',
+      body: bookingForm,
+    })
+    bookings.value = [...bookings.value, created]
+    saveLocalBookings()
+    showBookingModal.value = false
+  } catch (error) {
+    const localBooking: Booking = {
+      id: `local_${Date.now()}`,
+      quoteRequestId: bookingForm.quoteRequestId,
+      customerName: bookingForm.customerName,
+      phoneNumber: bookingForm.phoneNumber,
+      serviceType: bookingForm.serviceType,
+      pickupPostcode: bookingForm.pickupPostcode,
+      deliveryPostcode: bookingForm.deliveryPostcode,
+      bookingDate: bookingForm.bookingDate,
+      status: bookingForm.status,
+      notes: bookingForm.notes,
+      createdAt: new Date().toISOString(),
+    }
+    bookings.value = [...bookings.value, localBooking]
+    saveLocalBookings()
+    showBookingModal.value = false
+  } finally {
+    bookingSaving.value = false
+  }
 }
 
 async function loginAdmin() {
@@ -759,6 +853,7 @@ async function loginAdmin() {
                 <th class="px-5 py-4 font-semibold">Service</th>
                 <th class="px-5 py-4 font-semibold">Date</th>
                 <th class="px-5 py-4 font-semibold">Status</th>
+                <th class="px-5 py-4 font-semibold">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-dach-line">
@@ -771,6 +866,9 @@ async function loginAdmin() {
                 <td class="px-5 py-4">{{ quote.serviceType || '-' }}</td>
                 <td class="px-5 py-4">{{ quote.preferredDate || 'Flexible' }}</td>
                 <td class="px-5 py-4"><span class="bg-dach-orange/10 px-3 py-1 text-xs font-bold uppercase text-dach-orange">{{ quote.status }}</span></td>
+                <td class="px-5 py-4">
+                  <button class="rounded-full bg-dach-orange px-4 py-2 text-xs font-bold text-white" type="button" @click="openBookingForm(quote)">Book</button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -787,21 +885,106 @@ async function loginAdmin() {
             <h2 class="font-google-sans text-2xl font-bold">September 2026</h2>
             <button class="border border-dach-line bg-white px-4 py-3" type="button">&gt;</button>
           </div>
-          <button class="bg-dach-orange px-5 py-4 font-semibold text-white" type="button"><FontAwesomeIcon icon="plus" class="mr-2" />Add Booking</button>
+          <button class="rounded-full bg-dach-orange px-5 py-4 font-semibold text-white" type="button" @click="openBookingForm()"><FontAwesomeIcon icon="plus" class="mr-2" />Add Booking</button>
+        </div>
+        <div class="mb-6 grid gap-5 xl:grid-cols-3">
+          <article class="border border-dach-line bg-white p-5 shadow-sm">
+            <p class="text-sm font-semibold text-dach-muted">Today's jobs</p>
+            <p class="mt-2 text-3xl font-bold">{{ todaysJobs.length }}</p>
+          </article>
+          <article class="border border-dach-line bg-white p-5 shadow-sm">
+            <p class="text-sm font-semibold text-dach-muted">Confirmed bookings</p>
+            <p class="mt-2 text-3xl font-bold">{{ confirmedBookings.length }}</p>
+          </article>
+          <article class="border border-dach-line bg-white p-5 shadow-sm">
+            <p class="text-sm font-semibold text-dach-muted">Next move</p>
+            <p class="mt-2 text-lg font-bold">{{ nextBooking?.customerName || 'No job scheduled' }}</p>
+          </article>
         </div>
         <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
           <div class="grid grid-cols-7 border-b border-dach-line bg-[#151515] text-center text-xs font-bold uppercase tracking-[0.14em] text-white">
             <span v-for="day in calendarDays" :key="day" class="py-4">{{ day }}</span>
           </div>
           <div class="grid grid-cols-7">
-            <div v-for="cell in calendarCells" :key="cell" class="min-h-28 border-r border-t border-dach-line p-3 text-sm" :class="cell === '7' ? 'bg-dach-orange/5 ring-1 ring-inset ring-dach-orange text-dach-orange' : 'bg-white'">
+            <div v-for="(cell, index) in calendarCells" :key="`${cell}-${index}`" class="min-h-32 border-r border-t border-dach-line p-3 text-sm" :class="cell === '7' && index === 7 ? 'bg-dach-orange/5 ring-1 ring-inset ring-dach-orange text-dach-orange' : 'bg-white'">
               <span class="font-semibold">{{ cell }}</span>
-              <p v-if="cell === '7' && confirmedBookings.length" class="mt-3 bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">{{ confirmedBookings[0].customerName }}</p>
+              <div v-if="calendarCellBookings(cell, index).length" class="mt-3 grid gap-2">
+                <button
+                  v-for="booking in calendarCellBookings(cell, index).slice(0, 2)"
+                  :key="booking.id"
+                  class="rounded-xl bg-green-100 px-3 py-2 text-left text-xs font-semibold text-green-800"
+                  type="button"
+                >
+                  {{ booking.customerName }}<br />
+                  <span class="font-normal">{{ booking.pickupPostcode }} -> {{ booking.deliveryPostcode }}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
         <p class="mt-5 text-sm text-dach-muted"><span class="text-dach-orange">■</span> New <span class="ml-6 text-green-600">■</span> Confirmed</p>
       </section>
+
+      <div v-if="showBookingModal" class="fixed inset-0 z-50 grid place-items-center bg-dach-black/65 p-6 backdrop-blur-sm">
+        <form class="w-full max-w-3xl rounded-3xl bg-white p-7 shadow-2xl" @submit.prevent="createBooking">
+          <div class="mb-6 flex items-start justify-between gap-6 border-b border-dach-line pb-5">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-[0.14em] text-dach-orange">New Move Booking</p>
+              <h2 class="mt-2 font-google-sans text-3xl font-bold">Schedule a removal job</h2>
+              <p class="mt-2 text-dach-muted">Capture the customer, route, service, date, and crew notes.</p>
+            </div>
+            <button class="rounded-full border border-dach-line px-4 py-2 text-sm font-semibold text-dach-muted" type="button" @click="showBookingModal = false">Close</button>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold">Customer name</span>
+              <input v-model="bookingForm.customerName" required class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="e.g. Sarah Moore" />
+            </label>
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold">Phone number</span>
+              <input v-model="bookingForm.phoneNumber" class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="+44..." />
+            </label>
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold">Pickup postcode</span>
+              <input v-model="bookingForm.pickupPostcode" required class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="SW4 0EX" />
+            </label>
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold">Delivery postcode</span>
+              <input v-model="bookingForm.deliveryPostcode" required class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="E8 1ND" />
+            </label>
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold">Service type</span>
+              <select v-model="bookingForm.serviceType" class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange">
+                <option>House Move</option>
+                <option>Man and Van</option>
+                <option>Office Relocation</option>
+                <option>Student Move</option>
+                <option>Furniture Delivery</option>
+                <option>Packing and Storage</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold">Booking date</span>
+              <input v-model="bookingForm.bookingDate" required type="date" class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" />
+            </label>
+          </div>
+
+          <label class="mt-4 block">
+            <span class="mb-2 block text-sm font-semibold">Crew and access notes</span>
+            <textarea v-model="bookingForm.notes" class="min-h-28 w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="Stairs, lift, parking, fragile items, van size, crew size..." />
+          </label>
+
+          <p v-if="bookingError" class="mt-4 rounded-2xl bg-dach-orange/10 px-4 py-3 text-sm font-semibold text-dach-orange">{{ bookingError }}</p>
+
+          <div class="mt-6 flex items-center justify-end gap-3">
+            <button class="rounded-full border border-dach-line px-5 py-3 font-semibold text-dach-muted" type="button" @click="showBookingModal = false">Cancel</button>
+            <button class="rounded-full bg-dach-orange px-6 py-3 font-semibold text-white disabled:opacity-60" type="submit" :disabled="bookingSaving">
+              {{ bookingSaving ? 'Saving...' : 'Save Booking' }}
+            </button>
+          </div>
+        </form>
+      </div>
 
       <section v-if="activeAdminView === 'messages'" class="p-9">
         <div class="mb-6 flex items-end justify-between">
