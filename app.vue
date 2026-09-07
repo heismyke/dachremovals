@@ -283,7 +283,13 @@ async function loginAdmin() {
       <div class="absolute inset-0 -z-10 bg-gradient-to-r from-dach-black/88 via-dach-black/58 to-dach-black/18" />
       <div class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-dach-black/60 to-transparent" />
 
-      <div class="section-wrap relative grid min-h-[700px] items-center gap-12 py-20 lg:grid-cols-[0.92fr_430px]">
+      <Motion
+        as="div"
+        class="section-wrap relative grid min-h-[700px] items-center gap-12 py-20 lg:grid-cols-[0.92fr_430px]"
+        :initial="{ opacity: 0 }"
+        :animate="{ opacity: 1 }"
+        :transition="{ duration: 0.5, ease: 'easeOut' }"
+      >
         <Motion
           as="div"
           class="max-w-2xl"
@@ -358,24 +364,34 @@ async function loginAdmin() {
           </button>
           <p class="mt-4 text-center text-sm text-white/75"><FontAwesomeIcon icon="lock" class="mr-1" /> Secure enquiry. Rated 4.8/5.</p>
         </Motion>
-      </div>
+      </Motion>
     </section>
 
     <section id="how-it-works" class="section-wrap relative overflow-hidden py-24">
       <span class="route-lines right-0 top-10 opacity-50" />
       <span class="corner-mark bottom-12 left-0 opacity-60" />
-      <div class="grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end">
+      <Motion
+        as="div"
+        class="grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end"
+        :initial="{ opacity: 0, y: 28 }"
+        :whileInView="{ opacity: 1, y: 0 }"
+        :inViewOptions="{ once: true, margin: '-80px' }"
+        :transition="{ duration: 0.5, ease: 'easeOut' }"
+      >
         <h2 class="text-4xl font-bold tracking-tight md:text-5xl">How it works.</h2>
         <p class="text-lg leading-8 text-dach-muted">Five quick steps from quote to moving day.</p>
-      </div>
+      </Motion>
       <div class="mt-12 grid gap-5 md:grid-cols-5">
         <Motion
           v-for="(step, index) in quoteSteps"
           :key="step.title"
           as="article"
           class="rounded-3xl border border-dach-line bg-white p-6 shadow-sm"
+          :initial="{ opacity: 0, y: 26 }"
+          :whileInView="{ opacity: 1, y: 0 }"
+          :inViewOptions="{ once: true, margin: '-70px' }"
           :whileHover="{ y: -5 }"
-          :transition="{ duration: 0.2, ease: 'easeOut' }"
+          :transition="{ duration: 0.45, ease: 'easeOut', delay: index * 0.05 }"
         >
           <span class="mb-7 flex h-11 w-11 items-center justify-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="step.icon" /></span>
           <span class="text-sm font-semibold text-dach-muted">0{{ index + 1 }}</span>
@@ -387,14 +403,31 @@ async function loginAdmin() {
 
     <section id="services" class="relative overflow-hidden border-y border-dach-line bg-white py-20">
       <div class="abstract-grid absolute inset-y-0 right-0 w-1/2 opacity-50" />
-      <div class="section-wrap">
-        <div class="grid gap-4 lg:grid-cols-[0.7fr_1fr] lg:items-end">
+      <div class="section-wrap relative">
+        <Motion
+          as="div"
+          class="grid gap-4 lg:grid-cols-[0.7fr_1fr] lg:items-end"
+          :initial="{ opacity: 0, y: 28 }"
+          :whileInView="{ opacity: 1, y: 0 }"
+          :inViewOptions="{ once: true, margin: '-80px' }"
+          :transition="{ duration: 0.5, ease: 'easeOut' }"
+        >
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Services.</h2>
           <p class="max-w-xl text-lg leading-8 text-dach-muted">Home, office, student, furniture, packing, and storage moves.</p>
-        </div>
+        </Motion>
 
         <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          <article v-for="(service, index) in services" :key="service.title" class="relative overflow-hidden rounded-3xl border border-dach-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-100">
+          <Motion
+            v-for="(service, index) in services"
+            :key="service.title"
+            as="article"
+            class="relative overflow-hidden rounded-3xl border border-dach-line bg-white shadow-sm transition hover:shadow-xl hover:shadow-orange-100"
+            :initial="{ opacity: 0, y: 30 }"
+            :whileInView="{ opacity: 1, y: 0 }"
+            :inViewOptions="{ once: true, margin: '-70px' }"
+            :whileHover="{ y: -6 }"
+            :transition="{ duration: 0.45, ease: 'easeOut', delay: index * 0.04 }"
+          >
             <img v-if="index < 2" :src="service.image" :alt="service.title" class="h-44 w-full object-cover" />
             <div class="p-6">
               <span class="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
@@ -405,7 +438,7 @@ async function loginAdmin() {
               </ul>
               <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
             </div>
-          </article>
+          </Motion>
         </div>
       </div>
     </section>
@@ -413,32 +446,65 @@ async function loginAdmin() {
     <section id="areas" class="relative overflow-hidden border-y border-dach-line bg-gray-50 py-24">
       <span class="route-lines left-10 top-24 opacity-40" />
       <div class="section-wrap grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
-        <div>
+        <Motion
+          as="div"
+          :initial="{ opacity: 0, x: -28 }"
+          :whileInView="{ opacity: 1, x: 0 }"
+          :inViewOptions="{ once: true, margin: '-80px' }"
+          :transition="{ duration: 0.5, ease: 'easeOut' }"
+        >
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover.</h2>
           <p class="mt-5 leading-8 text-dach-muted">Local and long-distance removals across the UK.</p>
           <div class="mt-8 flex flex-wrap gap-3">
             <span v-for="routePair in routePairs" :key="routePair" class="rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
           </div>
-        </div>
+        </Motion>
         <div class="grid gap-5 md:grid-cols-2">
-          <article v-for="[area, cities] in areas" :key="area" class="rounded-3xl bg-white p-6 shadow-sm">
+          <Motion
+            v-for="([area, cities], index) in areas"
+            :key="area"
+            as="article"
+            class="rounded-3xl bg-white p-6 shadow-sm"
+            :initial="{ opacity: 0, y: 24 }"
+            :whileInView="{ opacity: 1, y: 0 }"
+            :inViewOptions="{ once: true, margin: '-70px' }"
+            :whileHover="{ y: -4 }"
+            :transition="{ duration: 0.42, ease: 'easeOut', delay: index * 0.04 }"
+          >
             <h3 class="text-lg font-bold"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />{{ area }}</h3>
             <ul class="mt-4 grid gap-2 text-sm text-dach-muted">
               <li v-for="city in cities" :key="city">-> {{ city }}</li>
             </ul>
-          </article>
+          </Motion>
         </div>
       </div>
     </section>
 
-    <section id="faq" class="section-wrap grid gap-10 py-24 lg:grid-cols-[0.7fr_1.3fr]">
+    <Motion
+      id="faq"
+      as="section"
+      class="section-wrap grid gap-10 py-24 lg:grid-cols-[0.7fr_1.3fr]"
+      :initial="{ opacity: 0, y: 28 }"
+      :whileInView="{ opacity: 1, y: 0 }"
+      :inViewOptions="{ once: true, margin: '-80px' }"
+      :transition="{ duration: 0.5, ease: 'easeOut' }"
+    >
       <div>
         <h2 class="text-4xl font-bold tracking-tight md:text-5xl">FAQ.</h2>
         <p class="mt-5 leading-8 text-dach-muted">Quick answers before you book.</p>
         <p class="mt-8 font-semibold">Need help? <a :href="`mailto:${brand.email}`" class="text-dach-orange">{{ brand.email }}</a></p>
       </div>
       <div class="space-y-3">
-        <article v-for="(faq, index) in faqs" :key="faq" class="overflow-hidden rounded-2xl border border-dach-line">
+        <Motion
+          v-for="(faq, index) in faqs"
+          :key="faq"
+          as="article"
+          class="overflow-hidden rounded-2xl border border-dach-line"
+          :initial="{ opacity: 0, x: 18 }"
+          :whileInView="{ opacity: 1, x: 0 }"
+          :inViewOptions="{ once: true, margin: '-70px' }"
+          :transition="{ duration: 0.35, ease: 'easeOut', delay: index * 0.04 }"
+        >
           <button class="flex w-full items-center justify-between p-5 text-left font-semibold" @click="openFaq = openFaq === index ? -1 : index">
             {{ faq }}
             <FontAwesomeIcon :icon="openFaq === index ? 'chevron-down' : 'arrow-right'" class="text-dach-orange" />
@@ -446,13 +512,20 @@ async function loginAdmin() {
           <p v-if="openFaq === index" class="px-5 pb-5 leading-7 text-dach-muted">
             Send the quote form or call us. We will confirm the right service and availability.
           </p>
-        </article>
+        </Motion>
       </div>
-    </section>
+    </Motion>
 
     <section class="relative overflow-hidden bg-dach-black py-20 text-white">
       <span class="corner-mark right-24 top-8 border-white/15 opacity-60" />
-      <div class="section-wrap grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+      <Motion
+        as="div"
+        class="section-wrap grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center"
+        :initial="{ opacity: 0, y: 28 }"
+        :whileInView="{ opacity: 1, y: 0 }"
+        :inViewOptions="{ once: true, margin: '-80px' }"
+        :transition="{ duration: 0.5, ease: 'easeOut' }"
+      >
         <div>
           <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Ready to move?</h2>
           <p class="mt-4 max-w-2xl leading-8 text-white/70">Get a quote or call the team.</p>
@@ -461,7 +534,7 @@ async function loginAdmin() {
           <a href="#quote" class="rounded-full bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
           <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/20 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
         </div>
-      </div>
+      </Motion>
     </section>
 
     <footer class="relative overflow-hidden bg-[#101010] py-16 text-white">
