@@ -5,6 +5,12 @@ import { areas, brand, faqs, navigation, quoteSteps, routePairs, services, trust
 
 const route = useRoute()
 const openFaq = ref(0)
+const currentHeroSlide = ref(0)
+const heroSlides = [
+  { title: 'House removals', image: '/images/hero-removals.png', position: 'object-center' },
+  { title: 'Man and van', image: '/images/hero-removals.png', position: 'object-left' },
+  { title: 'Same-day moves', image: '/images/hero-removals.png', position: 'object-right' },
+]
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const activeAdminView = computed(() => {
   if (route.path.includes('/quotes')) return 'quotes'
@@ -13,6 +19,18 @@ const activeAdminView = computed(() => {
   if (route.path.includes('/content')) return 'content'
   if (route.path.includes('/login')) return 'login'
   return 'dashboard'
+})
+
+let heroTimer: ReturnType<typeof setInterval> | undefined
+
+onMounted(() => {
+  heroTimer = setInterval(() => {
+    currentHeroSlide.value = (currentHeroSlide.value + 1) % heroSlides.length
+  }, 4500)
+})
+
+onBeforeUnmount(() => {
+  if (heroTimer) clearInterval(heroTimer)
 })
 </script>
 
@@ -49,42 +67,61 @@ const activeAdminView = computed(() => {
     </header>
 
     <section class="relative overflow-hidden bg-dach-black text-white">
-      <img src="/images/hero-removals.png" alt="Dach Removals crew loading a van" class="absolute inset-0 h-full w-full object-cover opacity-35" />
-      <div class="absolute inset-0 bg-gradient-to-r from-dach-black via-dach-black/80 to-dach-black/25" />
+      <img
+        v-for="(slide, index) in heroSlides"
+        :key="slide.title"
+        :src="slide.image"
+        :alt="slide.title"
+        class="absolute inset-0 h-full w-full object-cover transition duration-1000"
+        :class="[slide.position, currentHeroSlide === index ? 'scale-100 opacity-45' : 'scale-105 opacity-0']"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-dach-black via-dach-black/82 to-dach-black/35" />
+      <div class="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-dach-black/45 to-transparent" />
 
-      <div class="section-wrap relative grid min-h-[720px] items-center gap-12 py-20 lg:grid-cols-[1fr_470px]">
+      <div class="section-wrap relative grid min-h-[660px] items-center gap-12 py-16 lg:grid-cols-[1fr_430px]">
         <Motion
           as="div"
           :initial="{ opacity: 0, y: 24 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut' }"
         >
-          <div class="mb-8 flex flex-wrap gap-3">
-            <span v-for="badge in trustBadges" :key="badge" class="bg-white/12 px-4 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
+          <div class="mb-7 flex flex-wrap gap-2">
+            <span v-for="badge in trustBadges" :key="badge" class="border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
           </div>
-          <h1 class="max-w-3xl text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
+          <h1 class="max-w-3xl text-5xl font-bold leading-[1.02] tracking-tight md:text-7xl">
             UK removals, <span class="text-dach-orange">made simple.</span>
           </h1>
-          <p class="mt-6 max-w-xl text-lg leading-8 text-white/82">Fast quotes. Careful movers. Clear pricing.</p>
-          <div class="mt-9 flex flex-wrap gap-4">
-            <a href="#quote" class="bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
+          <p class="mt-5 max-w-xl text-lg leading-8 text-white/82">Fast quotes. Careful movers. Clear pricing.</p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#quote" class="bg-dach-orange px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               Get a Quote <FontAwesomeIcon icon="arrow-right" class="ml-2" />
             </a>
-            <a :href="`tel:${brand.phone}`" class="border border-white/30 px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
+            <a :href="`tel:${brand.phone}`" class="border border-white/25 px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               <FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}
             </a>
+          </div>
+          <div class="mt-10 flex items-center gap-3">
+            <button
+              v-for="(slide, index) in heroSlides"
+              :key="`dot-${slide.title}`"
+              class="h-1.5 w-10 transition"
+              :class="currentHeroSlide === index ? 'bg-dach-orange' : 'bg-white/25'"
+              type="button"
+              :aria-label="`Show ${slide.title}`"
+              @click="currentHeroSlide = index"
+            />
           </div>
         </Motion>
 
         <Motion
           id="quote"
           as="form"
-          class="bg-white p-7 text-dach-black shadow-2xl shadow-black/30"
+          class="border border-white/10 bg-white p-6 text-dach-black shadow-2xl shadow-black/30"
           :initial="{ opacity: 0, y: 26 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
         >
-          <h2 class="text-2xl font-bold tracking-tight">Get Your Price Instantly</h2>
+          <h2 class="text-2xl font-bold tracking-tight">Get Your Price</h2>
           <p class="mt-2 text-sm text-dach-muted">Enter your details. We confirm the rest.</p>
 
           <label class="mt-6 block text-sm font-semibold">Moving From</label>
