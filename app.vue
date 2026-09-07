@@ -621,8 +621,7 @@ async function loginAdmin() {
       <header class="sticky top-0 z-30 border-b border-dach-line bg-white/95 px-9 py-5 backdrop-blur">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-dach-orange">Dach Removals</p>
-            <h1 class="mt-1 font-google-sans text-3xl font-bold">
+            <h1 class="font-google-sans text-3xl font-bold">
               {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings Calendar' : activeAdminView === 'messages' ? 'Messages' : 'Business Setup' }}
             </h1>
           </div>
