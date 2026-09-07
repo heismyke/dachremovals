@@ -470,12 +470,8 @@ async function loginAdmin() {
 
   <div v-else class="grid min-h-screen grid-cols-[288px_1fr] bg-[#f7f3ef] text-dach-black">
     <aside class="sticky top-0 flex h-screen flex-col bg-[#111111] text-white">
-      <div class="border-b border-white/10 px-6 py-6">
+      <div class="border-b border-white/10 px-6 py-7">
         <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto bg-white object-contain" />
-        <div class="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-          <span class="h-2 w-2 rounded-full bg-green-500" />
-          Admin console
-        </div>
       </div>
 
       <nav class="space-y-1 px-4 py-5">
