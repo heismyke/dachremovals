@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
 import { adminNavItems, calendarCells, calendarDays, dashboardCards, editableSections } from './data/admin'
-import { areas, brand, comparison, faqs, navigation, quoteSteps, resources, routePairs, services, testimonials, trustBadges } from './data/content'
+import { areas, brand, faqs, navigation, quoteSteps, routePairs, services, trustBadges } from './data/content'
 
 const route = useRoute()
 const featuredServices = services.slice(0, 2)
@@ -64,11 +64,9 @@ const activeAdminView = computed(() => {
             <span v-for="badge in trustBadges" :key="badge" class="bg-white/12 px-4 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
           </div>
           <h1 class="max-w-3xl text-5xl font-extrabold leading-[1.02] tracking-tight md:text-7xl">
-            Professional UK removals, <span class="text-dach-orange">made simple.</span>
+            UK removals, <span class="text-dach-orange">made simple.</span>
           </h1>
-          <p class="mt-6 max-w-2xl text-lg leading-8 text-white/82">
-            Fast quotes, careful movers, and reliable man and van support for homes, offices, student moves, furniture deliveries, packing, and storage.
-          </p>
+          <p class="mt-6 max-w-xl text-lg leading-8 text-white/82">Fast quotes. Careful movers. Clear pricing.</p>
           <div class="font-sf-mono mt-9 flex flex-wrap gap-4">
             <a href="#quote" class="bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               Get a Quote <FontAwesomeIcon icon="arrow-right" class="ml-2" />
@@ -88,7 +86,7 @@ const activeAdminView = computed(() => {
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
         >
           <h2 class="text-2xl font-bold tracking-tight">Get Your Price Instantly</h2>
-          <p class="mt-2 text-sm text-dach-muted">No waiting around. Send the details and we confirm clearly.</p>
+          <p class="mt-2 text-sm text-dach-muted">Enter your details. We confirm the rest.</p>
 
           <label class="mt-6 block text-sm font-semibold">Moving From</label>
           <div class="mt-2 flex items-center gap-3 bg-dach-cream px-4 py-4 text-dach-muted">
@@ -122,8 +120,8 @@ const activeAdminView = computed(() => {
 
     <section id="how-it-works" class="section-wrap py-24">
       <div class="grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end">
-        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Get a clear removals quote without the back and forth.</h2>
-        <p class="text-lg leading-8 text-dach-muted">The quote flow keeps the important details simple: locations, move type, date, access, and the level of help required.</p>
+        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">How it works.</h2>
+        <p class="text-lg leading-8 text-dach-muted">Five quick steps from quote to moving day.</p>
       </div>
       <div class="mt-12 grid gap-5 md:grid-cols-5">
         <Motion
@@ -145,8 +143,8 @@ const activeAdminView = computed(() => {
     <section id="services" class="border-y border-dach-line bg-dach-cream py-24">
       <div class="section-wrap">
         <div class="grid gap-6 lg:grid-cols-[0.7fr_1fr] lg:items-end">
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Removal services for every type of move.</h2>
-          <p class="text-lg leading-8 text-dach-muted">From one item to a full home, Dach Removals gives you the right crew, vehicle, and support for the job.</p>
+          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Services.</h2>
+          <p class="text-lg leading-8 text-dach-muted">Home, office, student, furniture, packing, and storage moves.</p>
         </div>
 
         <div class="mt-12 grid gap-6 lg:grid-cols-2">
@@ -158,7 +156,6 @@ const activeAdminView = computed(() => {
               <ul class="mt-5 grid gap-2 text-sm text-dach-muted">
                 <li v-for="item in service.idealFor" :key="item"><FontAwesomeIcon icon="check" class="mr-2 text-dach-orange" />{{ item }}</li>
               </ul>
-              <p class="mt-5 leading-7">{{ service.detail }}</p>
               <div class="mt-6 flex gap-3">
                 <a href="#quote" class="font-sf-mono bg-dach-orange px-5 py-3 font-semibold text-white">Get Quote</a>
                 <a href="#faq" class="font-sf-mono border border-dach-line px-5 py-3 font-semibold">Learn More</a>
@@ -178,27 +175,19 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <section class="section-wrap py-24">
-      <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-        <div>
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Reliable movers, clear communication, prepared crews.</h2>
-          <p class="mt-5 leading-8 text-dach-muted">A professional removals page should make the offer obvious. This one focuses on practical proof, direct contact, and simple booking actions.</p>
-        </div>
-        <div class="grid gap-4 md:grid-cols-2">
-          <article v-for="[label, ours, traditional] in comparison" :key="label" class="border border-dach-line p-6">
-            <p class="font-sf-mono text-sm font-semibold uppercase tracking-[0.16em] text-dach-orange">{{ label }}</p>
-            <p class="mt-4 font-semibold"><FontAwesomeIcon icon="check" class="mr-2 text-dach-orange" />{{ ours }}</p>
-            <p class="mt-2 text-sm text-dach-muted">Typical issue: {{ traditional }}</p>
-          </article>
-        </div>
+    <section class="section-wrap py-16">
+      <div class="grid gap-4 md:grid-cols-4">
+        <article v-for="badge in trustBadges" :key="badge" class="border border-dach-line p-6 text-center font-sf-mono font-semibold">
+          {{ badge }}
+        </article>
       </div>
     </section>
 
     <section id="areas" class="border-y border-dach-line bg-gray-50 py-24">
       <div class="section-wrap grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
         <div>
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover across the UK.</h2>
-          <p class="mt-5 leading-8 text-dach-muted">Dach Removals supports local and long-distance moves across major UK regions.</p>
+          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover.</h2>
+          <p class="mt-5 leading-8 text-dach-muted">Local and long-distance removals across the UK.</p>
           <div class="mt-8 flex flex-wrap gap-3">
             <span v-for="routePair in routePairs" :key="routePair" class="font-sf-mono bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
           </div>
@@ -214,51 +203,10 @@ const activeAdminView = computed(() => {
       </div>
     </section>
 
-    <section id="reviews" class="section-wrap py-24">
-      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">What customers say.</h2>
-        </div>
-        <p class="text-dach-muted"><FontAwesomeIcon icon="star" class="text-dach-orange" /> 4.8/5 from 2,500+ reviews</p>
-      </div>
-      <div class="mt-10 grid gap-5 md:grid-cols-4">
-        <article v-for="[name, city, quote] in testimonials" :key="name" class="border border-dach-line p-6">
-          <p class="text-dach-orange">*****</p>
-          <p class="mt-5 leading-7">"{{ quote }}"</p>
-          <p class="mt-8 font-bold">{{ name }}</p>
-          <p class="text-sm text-dach-muted">{{ city }}</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="relative overflow-hidden py-24 text-white">
-      <img src="/images/hero-removals.png" alt="" class="absolute inset-0 h-full w-full object-cover" />
-      <div class="absolute inset-0 bg-gradient-to-r from-dach-black/88 via-dach-black/72 to-dach-black/48" />
-      <div class="absolute inset-0 bg-dach-black/20" />
-      <div class="section-wrap relative">
-        <h2 class="max-w-2xl text-4xl font-bold tracking-tight md:text-5xl">Helpful moving resources.</h2>
-        <div class="mt-10 grid gap-5 md:grid-cols-3">
-          <article v-for="[icon, title, copy] in resources" :key="title" class="bg-white/95 p-6 text-dach-black shadow-xl shadow-black/20 backdrop-blur">
-            <div class="mb-6 flex items-center justify-between border-b border-dach-line pb-6">
-              <span class="flex h-12 w-12 items-center justify-center bg-dach-orange text-white">
-                <FontAwesomeIcon :icon="icon" />
-              </span>
-              <span class="font-sf-mono text-sm font-semibold uppercase tracking-[0.16em] text-dach-muted">Guide</span>
-            </div>
-            <h3 class="text-xl font-bold">{{ title }}</h3>
-            <p class="mt-3 leading-7 text-dach-muted">{{ copy }}</p>
-            <a href="#quote" class="font-sf-mono mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">
-              Get advice <FontAwesomeIcon icon="arrow-right" />
-            </a>
-          </article>
-        </div>
-      </div>
-    </section>
-
     <section id="faq" class="section-wrap grid gap-10 py-24 lg:grid-cols-[0.7fr_1.3fr]">
       <div>
-        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Frequently asked questions.</h2>
-        <p class="mt-5 leading-8 text-dach-muted">Answers to the common questions people ask before booking a removals crew.</p>
+        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">FAQ.</h2>
+        <p class="mt-5 leading-8 text-dach-muted">Quick answers before you book.</p>
         <p class="mt-8 font-semibold">Need help? <a :href="`mailto:${brand.email}`" class="text-dach-orange">{{ brand.email }}</a></p>
       </div>
       <div class="space-y-3">
@@ -268,7 +216,7 @@ const activeAdminView = computed(() => {
             <FontAwesomeIcon :icon="openFaq === index ? 'chevron-down' : 'arrow-right'" class="text-dach-orange" />
           </button>
           <p v-if="openFaq === index" class="px-5 pb-5 leading-7 text-dach-muted">
-            Send your details through the quote form or call us directly. We will confirm the right service, availability, and next steps for your move.
+            Send the quote form or call us. We will confirm the right service and availability.
           </p>
         </article>
       </div>
@@ -277,8 +225,8 @@ const activeAdminView = computed(() => {
     <section class="bg-dach-black py-20 text-white">
       <div class="section-wrap grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Ready to plan your move?</h2>
-          <p class="mt-4 max-w-2xl leading-8 text-white/70">Send the details once. We will come back with clear pricing, availability, and the best crew for the job.</p>
+          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Ready to move?</h2>
+          <p class="mt-4 max-w-2xl leading-8 text-white/70">Get a quote or call the team.</p>
         </div>
         <div class="flex flex-wrap gap-3">
           <a href="#quote" class="font-sf-mono bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
@@ -300,7 +248,7 @@ const activeAdminView = computed(() => {
               <span class="block text-[10px] font-bold uppercase tracking-[0.35em] text-dach-orange">Removals</span>
             </span>
           </div>
-          <p class="text-white/60">Professional removals across the UK. Reliable crews, direct support, and clear pricing.</p>
+          <p class="text-white/60">UK removals. Clear pricing. Careful crews.</p>
         </div>
         <div>
           <h3 class="font-sf-mono font-semibold">Services</h3>

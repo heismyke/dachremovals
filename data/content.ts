@@ -13,11 +13,11 @@ export const navigation = [
 ]
 
 export const quoteSteps = [
-  { icon: 'location-dot', title: 'Enter Postcodes', copy: 'Tell us where you are moving from and where everything needs to go.' },
-  { icon: 'box', title: 'Choose Service', copy: 'Select the move type, access details, and the level of help you need.' },
-  { icon: 'credit-card', title: 'Get a Clear Price', copy: 'Receive a straightforward estimate with no hidden call-out charges.' },
-  { icon: 'calendar-days', title: 'Pick a Date', copy: 'Choose a preferred date and we confirm the best available slot.' },
-  { icon: 'shield-halved', title: 'Move With Confidence', copy: 'Our insured crew arrives prepared with blankets, straps, and care.' },
+  { icon: 'location-dot', title: 'Postcodes', copy: 'From and to.' },
+  { icon: 'box', title: 'Move Type', copy: 'Pick a service.' },
+  { icon: 'credit-card', title: 'Quote', copy: 'Clear pricing.' },
+  { icon: 'calendar-days', title: 'Date', copy: 'Choose a slot.' },
+  { icon: 'shield-halved', title: 'Move', copy: 'Crew arrives ready.' },
 ]
 
 export const services = [
@@ -25,40 +25,40 @@ export const services = [
     icon: 'van-shuttle',
     title: 'Man and Van',
     image: '/images/hero-removals.png',
-    description: 'A flexible service for smaller moves, single items, collections, and short-notice jobs.',
-    idealFor: ['Studio and 1-bed flat moves', 'Single furniture items', 'Student moves', 'Marketplace collections', 'Small office moves'],
+    description: 'Flexible moves, collections, and short-notice jobs.',
+    idealFor: ['Studio flats', 'Single items', 'Student moves', 'Marketplace pickups'],
     detail: 'A professional driver and fully equipped van, with loading and unloading support included.',
   },
   {
     icon: 'house',
     title: 'House Removals',
     image: '/images/hero-removals.png',
-    description: 'Full home removals handled by careful crews, from packing support to secure transport.',
-    idealFor: ['2-bed flats and houses', '3-bed family homes', '4+ bed properties', 'Difficult access moves', 'Long-distance moves'],
+    description: 'Full home removals with careful crews.',
+    idealFor: ['Flats and houses', 'Family homes', 'Long-distance moves', 'Difficult access'],
     detail: 'Teams are matched to your move size, with protective equipment for furniture and fragile items.',
   },
   {
     icon: 'building',
     title: 'Office Relocations',
-    description: 'Business moves planned around your schedule to reduce downtime and keep teams moving.',
+    description: 'Office moves with less downtime.',
     idealFor: ['Small offices', 'Retail spaces', 'Studio moves'],
   },
   {
     icon: 'graduation-cap',
     title: 'Student Removals',
-    description: 'Affordable help for end-of-term, room-to-room, and shared accommodation moves.',
+    description: 'Simple end-of-term moving help.',
     idealFor: ['University students', 'Term-time moves', 'Shared accommodation'],
   },
   {
     icon: 'truck',
     title: 'Furniture Delivery',
-    description: 'Large item pickups, IKEA runs, and marketplace collections delivered safely.',
+    description: 'Large items collected and delivered.',
     idealFor: ['IKEA collections', 'Large furniture', 'Marketplace pickups'],
   },
   {
     icon: 'warehouse',
     title: 'Packing and Storage',
-    description: 'Packing materials, careful wrapping, and flexible storage support when needed.',
+    description: 'Packing and short-term storage support.',
     idealFor: ['Packing support', 'Short-term storage', 'Fragile items'],
   },
 ]
@@ -98,13 +98,8 @@ export const resources = [
 
 export const faqs = [
   "What's the difference between man and van and house removals?",
-  'How do I find removal companies near me?',
   'Can I get a same-day removal?',
-  'What services does Dach Removals offer?',
   'Are your services insured?',
-  'How do I get an instant quote?',
   'What areas do you cover?',
-  'Can I book online without calling?',
   'Do you offer packing services?',
-  'What if I need to move items to storage?',
 ]
