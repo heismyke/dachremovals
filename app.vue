@@ -141,6 +141,36 @@ const filteredQuotes = computed(() => {
 const unreadMessages = computed(() => messages.value.filter((message) => !message.isRead))
 const confirmedBookings = computed(() => bookings.value.filter((booking) => booking.status === 'confirmed'))
 const nextBooking = computed(() => bookings.value.find((booking) => booking.bookingDate) || bookings.value[0])
+const currentCalendarDay = computed(() => {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'numeric',
+    timeZone: 'Europe/London',
+    year: 'numeric',
+  }).formatToParts(new Date())
+  const month = Number(parts.find((part) => part.type === 'month')?.value || 0)
+  if (month !== 9) return ''
+  return String(Number(parts.find((part) => part.type === 'day')?.value || 0))
+})
+const currentDateLabel = computed(() => new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'Europe/London',
+  weekday: 'short',
+  year: 'numeric',
+}).format(new Date()))
+const defaultBookingDate = computed(() => {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: 'Europe/London',
+    year: 'numeric',
+  }).formatToParts(new Date())
+  const year = parts.find((part) => part.type === 'year')?.value || '2026'
+  const month = parts.find((part) => part.type === 'month')?.value || '09'
+  const day = parts.find((part) => part.type === 'day')?.value || '08'
+  return `${year}-${month}-${day}`
+})
 const bookingsByCalendarDay = computed(() => {
   return bookings.value.reduce<Record<string, Booking[]>>((days, booking) => {
     const day = booking.bookingDate?.slice(0, 10) === '2026-09-01'
@@ -154,7 +184,7 @@ const bookingsByCalendarDay = computed(() => {
     return days
   }, {})
 })
-const todaysJobs = computed(() => bookingsByCalendarDay.value['7'] || [])
+const todaysJobs = computed(() => bookingsByCalendarDay.value[currentCalendarDay.value] || [])
 const dashboardStats = computed(() => [
   {
     label: 'New Quotes',
@@ -284,7 +314,7 @@ function openBookingForm(quote?: QuoteRequest) {
   bookingForm.serviceType = quote?.serviceType || 'House Move'
   bookingForm.pickupPostcode = quote?.pickupPostcode || ''
   bookingForm.deliveryPostcode = quote?.deliveryPostcode || ''
-  bookingForm.bookingDate = quote?.preferredDate?.match(/^\d{4}-\d{2}-\d{2}$/) ? quote.preferredDate : '2026-09-07'
+  bookingForm.bookingDate = quote?.preferredDate?.match(/^\d{4}-\d{2}-\d{2}$/) ? quote.preferredDate : defaultBookingDate.value
   bookingForm.status = 'confirmed'
   bookingForm.notes = quote?.additionalNotes || ''
   showBookingModal.value = true
@@ -706,74 +736,77 @@ async function loginAdmin() {
     </div>
   </div>
 
-  <div v-else class="grid min-h-screen grid-cols-[288px_1fr] bg-[#f7f3ef] text-dach-black">
-    <aside class="sticky top-0 flex h-screen flex-col bg-[#111111] text-white">
-      <div class="border-b border-white/10 px-6 py-7">
-        <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto bg-white object-contain" />
+  <div v-else class="grid min-h-screen grid-cols-[272px_1fr] bg-white text-dach-black">
+    <aside class="sticky top-0 flex h-screen flex-col border-r border-[#e8e2de] bg-white">
+      <div class="border-b border-[#e8e2de] px-6 py-7">
+        <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto object-contain" />
       </div>
 
-      <nav class="space-y-1 px-4 py-5">
+      <nav class="space-y-1 px-4 py-6">
         <NuxtLink
           v-for="item in adminNavItems"
           :key="item.label"
           :to="item.path"
-          class="group flex items-center gap-4 px-4 py-4 text-sm font-semibold text-white/55 transition hover:bg-white/5 hover:text-white"
-          :class="route.path === item.path ? 'bg-dach-orange text-white shadow-lg shadow-dach-orange/20 hover:bg-dach-orange' : ''"
+          class="group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[#7d7773] transition hover:bg-[#faf7f5] hover:text-dach-black"
+          :class="route.path === item.path ? 'bg-[#fff1eb] text-dach-orange' : ''"
         >
-          <span class="grid h-9 w-9 place-items-center bg-white/8 text-white/60 group-hover:text-white" :class="route.path === item.path ? 'bg-white/15 text-white' : ''">
+          <span class="grid h-9 w-9 place-items-center rounded-xl bg-[#f7f3f0] text-[#8b8581] group-hover:text-dach-black" :class="route.path === item.path ? 'bg-white text-dach-orange' : ''">
             <FontAwesomeIcon :icon="item.icon" />
           </span>
           <span>{{ item.label }}</span>
-          <span
-            v-if="(item.label === 'Quote Requests' && quotes.length > 0) || (item.label === 'Messages' && unreadMessages.length > 0)"
-            class="ml-auto rounded-full px-2.5 py-1 text-xs font-bold"
-            :class="route.path === item.path ? 'bg-white text-dach-orange' : 'bg-dach-orange text-white'"
-          >
-            {{ item.label === 'Quote Requests' ? quotes.length : unreadMessages.length }}
-          </span>
         </NuxtLink>
       </nav>
 
-      <div class="mx-4 mt-auto border-t border-white/10 py-5 text-sm font-semibold text-white/45">
-        <a href="/" class="flex items-center gap-3 px-4 py-3 transition hover:text-white"><FontAwesomeIcon icon="globe" />View Website</a>
-        <NuxtLink to="/admin/login" class="flex items-center gap-3 px-4 py-3 transition hover:text-white"><FontAwesomeIcon icon="right-from-bracket" />Sign Out</NuxtLink>
+      <div class="mx-4 mt-auto border-t border-[#e8e2de] py-5 text-sm font-semibold text-[#8b8581]">
+        <a href="/" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-[#faf7f5] hover:text-dach-black"><FontAwesomeIcon icon="globe" />View Website</a>
+        <NuxtLink to="/admin/login" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-[#faf7f5] hover:text-dach-black"><FontAwesomeIcon icon="right-from-bracket" />Sign Out</NuxtLink>
       </div>
     </aside>
 
     <main class="min-w-0">
-      <header class="sticky top-0 z-30 border-b border-dach-line bg-white/95 px-9 py-5 backdrop-blur">
+      <header class="sticky top-0 z-30 border-b border-[#e8e2de] bg-white/95 px-10 py-5 backdrop-blur">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="font-google-sans text-3xl font-bold">
-              {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings Calendar' : activeAdminView === 'messages' ? 'Messages' : 'Business Setup' }}
+            <h1 class="font-google-sans text-3xl font-semibold tracking-[-0.02em]">
+              {{ activeAdminView === 'dashboard' ? 'Dashboard' : activeAdminView === 'quotes' ? 'Quote Requests' : activeAdminView === 'bookings' ? 'Bookings' : activeAdminView === 'messages' ? 'Messages' : 'Business Setup' }}
             </h1>
           </div>
           <div class="flex items-center gap-4">
-            <button class="border border-dach-line bg-white px-4 py-3 text-sm font-semibold text-dach-muted" type="button" @click="loadAdminData">
+            <button class="rounded-full border border-[#e8e2de] bg-white px-4 py-3 text-sm font-semibold text-[#6f6a67] transition hover:border-dach-orange hover:text-dach-orange" type="button" @click="loadAdminData">
               <FontAwesomeIcon icon="rotate-right" class="mr-2 text-dach-orange" />Refresh
             </button>
-            <p class="text-sm text-dach-muted">Mon, 7 September 2026</p>
+            <p class="text-sm text-[#7d7773]">{{ currentDateLabel }}</p>
           </div>
         </div>
       </header>
 
-      <section v-if="activeAdminView === 'dashboard'" class="p-9">
-        <div class="grid gap-5 xl:grid-cols-4">
-          <article v-for="card in dashboardStats" :key="card.label" class="border border-dach-line bg-white p-6 shadow-sm">
+      <section v-if="activeAdminView === 'dashboard'" class="p-10">
+        <div class="mb-8 flex items-end justify-between gap-6">
+          <div>
+            <p class="text-sm font-medium text-[#7d7773]">Daily control room</p>
+            <h2 class="mt-2 font-google-sans text-4xl font-semibold tracking-[-0.035em]">Today at a glance.</h2>
+          </div>
+          <button class="rounded-full bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black" type="button" @click="openBookingForm()">
+            <FontAwesomeIcon icon="plus" class="mr-2" />Add Booking
+          </button>
+        </div>
+
+        <div class="grid gap-4 xl:grid-cols-4">
+          <article v-for="card in dashboardStats" :key="card.label" class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
             <div class="flex items-start justify-between">
-              <p class="text-xs font-bold uppercase tracking-[0.18em] text-dach-muted">{{ card.label }}</p>
-              <span class="grid h-10 w-10 place-items-center bg-dach-orange/10 text-dach-orange"><FontAwesomeIcon :icon="card.icon" /></span>
+              <p class="text-sm font-medium text-[#7d7773]">{{ card.label }}</p>
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-[#faf7f5] text-dach-orange"><FontAwesomeIcon :icon="card.icon" /></span>
             </div>
-            <p class="mt-5 font-google-sans text-4xl font-bold">{{ card.value }}</p>
-            <p :class="card.tone" class="mt-2 text-sm font-medium">{{ card.note }}</p>
+            <p class="mt-5 font-google-sans text-4xl font-semibold tracking-[-0.03em]">{{ card.value }}</p>
+            <p class="mt-2 text-sm font-medium text-[#7d7773]">{{ card.note }}</p>
           </article>
         </div>
 
-        <div class="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <article class="border border-dach-line bg-white shadow-sm">
-            <div class="flex items-center justify-between border-b border-dach-line px-6 py-5">
-              <h2 class="font-google-sans text-xl font-bold">Recent Quotes</h2>
-              <NuxtLink to="/admin/quotes" class="border border-dach-line px-4 py-2 text-sm font-semibold">View All</NuxtLink>
+        <div class="mt-8 grid gap-6 xl:grid-cols-[1fr_380px]">
+          <article class="rounded-[32px] border border-[#e8e2de] bg-white">
+            <div class="flex items-center justify-between border-b border-[#e8e2de] px-6 py-5">
+              <h2 class="font-google-sans text-xl font-semibold">Quote queue</h2>
+              <NuxtLink to="/admin/quotes" class="rounded-full border border-[#e8e2de] px-4 py-2 text-sm font-semibold text-[#6f6a67]">View All</NuxtLink>
             </div>
             <div v-if="quotes.length" class="divide-y divide-dach-line">
               <div v-for="quote in quotes.slice(0, 5)" :key="quote.id" class="grid grid-cols-[1fr_auto] gap-4 px-6 py-4">
@@ -784,90 +817,90 @@ async function loginAdmin() {
                 <span class="self-start bg-dach-orange/10 px-3 py-1 text-xs font-bold uppercase text-dach-orange">{{ quote.status }}</span>
               </div>
             </div>
-            <div v-else class="grid h-72 place-items-center p-8 text-center text-dach-muted">
+            <div v-else class="grid h-72 place-items-center p-8 text-center text-[#7d7773]">
               <div>
-                <FontAwesomeIcon icon="clipboard" class="mb-4 text-4xl text-dach-orange/70" />
+                <FontAwesomeIcon icon="clipboard" class="mb-4 text-3xl text-dach-orange/70" />
                 <p class="font-semibold text-dach-black">No quote requests yet</p>
                 <p class="mt-2 max-w-sm text-sm leading-6">New website enquiries will appear here with route, service, date, and contact details.</p>
               </div>
             </div>
           </article>
 
-          <article class="border border-dach-line bg-white shadow-sm">
-            <div class="flex items-center justify-between border-b border-dach-line px-6 py-5">
-              <h2 class="font-google-sans text-xl font-bold">Upcoming Bookings</h2>
-              <NuxtLink to="/admin/bookings" class="border border-dach-line px-4 py-2 text-sm font-semibold">Calendar</NuxtLink>
+          <article class="rounded-[32px] border border-[#e8e2de] bg-white">
+            <div class="flex items-center justify-between border-b border-[#e8e2de] px-6 py-5">
+              <h2 class="font-google-sans text-xl font-semibold">Today’s moves</h2>
+              <NuxtLink to="/admin/bookings" class="rounded-full border border-[#e8e2de] px-4 py-2 text-sm font-semibold text-[#6f6a67]">Calendar</NuxtLink>
             </div>
-            <div v-if="bookings.length" class="divide-y divide-dach-line">
-              <div v-for="booking in bookings.slice(0, 5)" :key="booking.id" class="px-6 py-4">
+            <div v-if="todaysJobs.length" class="divide-y divide-[#e8e2de]">
+              <div v-for="booking in todaysJobs.slice(0, 5)" :key="booking.id" class="px-6 py-4">
                 <p class="font-semibold">{{ booking.customerName }}</p>
                 <p class="mt-1 text-sm text-dach-muted">{{ booking.bookingDate || 'Date pending' }} · {{ booking.pickupPostcode }} -> {{ booking.deliveryPostcode }}</p>
               </div>
             </div>
-            <div v-else class="grid h-72 place-items-center p-8 text-center text-dach-muted">
+            <div v-else class="grid h-72 place-items-center p-8 text-center text-[#7d7773]">
               <div>
-                <FontAwesomeIcon icon="calendar-days" class="mb-4 text-4xl text-dach-orange/70" />
-                <p class="font-semibold text-dach-black">No booked moves yet</p>
-                <p class="mt-2 max-w-sm text-sm leading-6">Accepted quotes become scheduled jobs for the office and moving crew.</p>
+                <FontAwesomeIcon icon="calendar-days" class="mb-4 text-3xl text-dach-orange/70" />
+                <p class="font-semibold text-dach-black">No moves today</p>
+                <p class="mt-2 max-w-sm text-sm leading-6">Create a booking to add it to today’s schedule and the calendar.</p>
               </div>
             </div>
           </article>
         </div>
 
         <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-          <article class="border border-dach-line bg-white p-6 shadow-sm">
-            <h2 class="font-google-sans text-xl font-bold">Move Pipeline</h2>
-            <div class="mt-6 grid gap-3">
-              <div v-for="stage in ['New inquiry', 'Qualified', 'Quote sent', 'Booked', 'Dispatch ready']" :key="stage" class="flex items-center justify-between border border-dach-line px-4 py-3">
+          <article class="rounded-[32px] border border-[#e8e2de] bg-white p-6">
+            <h2 class="font-google-sans text-xl font-semibold">Move pipeline</h2>
+            <div class="mt-5 grid gap-3">
+              <div v-for="stage in ['New inquiry', 'Qualified', 'Quote sent', 'Booked', 'Dispatch ready']" :key="stage" class="flex items-center justify-between rounded-2xl bg-[#faf7f5] px-4 py-3">
                 <span class="font-semibold">{{ stage }}</span>
                 <span class="text-sm text-dach-muted">{{ stage === 'New inquiry' ? quotes.length : stage === 'Booked' ? bookings.length : 0 }}</span>
               </div>
             </div>
           </article>
-          <article class="border border-dach-line bg-[#151515] p-6 text-white shadow-sm">
-            <h2 class="font-google-sans text-xl font-bold">Dispatch Checklist</h2>
-            <div class="mt-6 grid gap-4 md:grid-cols-2">
-              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />Confirm pickup, delivery, access, and parking.</p>
-              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="user-group" class="mr-2 text-dach-orange" />Assign crew size and van type.</p>
-              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="shield-halved" class="mr-2 text-dach-orange" />Check insurance and fragile item notes.</p>
-              <p class="border border-white/10 bg-white/5 p-4 text-sm text-white/70"><FontAwesomeIcon icon="phone" class="mr-2 text-dach-orange" />Send final confirmation to the customer.</p>
+          <article class="rounded-[32px] border border-[#e8e2de] bg-white p-6">
+            <h2 class="font-google-sans text-xl font-semibold">Dispatch checklist</h2>
+            <div class="mt-5 grid gap-3 md:grid-cols-2">
+              <p class="rounded-2xl bg-[#faf7f5] p-4 text-sm text-[#6f6a67]"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />Confirm route, access, and parking.</p>
+              <p class="rounded-2xl bg-[#faf7f5] p-4 text-sm text-[#6f6a67]"><FontAwesomeIcon icon="user-group" class="mr-2 text-dach-orange" />Assign crew and van size.</p>
+              <p class="rounded-2xl bg-[#faf7f5] p-4 text-sm text-[#6f6a67]"><FontAwesomeIcon icon="shield-halved" class="mr-2 text-dach-orange" />Check fragile item notes.</p>
+              <p class="rounded-2xl bg-[#faf7f5] p-4 text-sm text-[#6f6a67]"><FontAwesomeIcon icon="phone" class="mr-2 text-dach-orange" />Send customer confirmation.</p>
             </div>
           </article>
         </div>
       </section>
 
-      <section v-if="activeAdminView === 'quotes'" class="p-9">
-        <div class="mb-6 flex items-center justify-between gap-4">
+      <section v-if="activeAdminView === 'quotes'" class="p-10">
+        <div class="mb-7 flex items-center justify-between gap-4">
           <div>
-            <h2 class="font-google-sans text-2xl font-bold">All Quote Requests</h2>
-            <p class="mt-1 text-dach-muted">{{ filteredQuotes.length }} requests found</p>
+            <p class="text-sm font-medium text-[#7d7773]">Customer enquiries</p>
+            <h2 class="mt-2 font-google-sans text-4xl font-semibold tracking-[-0.035em]">Quote requests.</h2>
           </div>
-          <input v-model="quoteSearch" class="w-80 border border-dach-line bg-white px-5 py-4 outline-none focus:border-dach-orange" placeholder="Search name or postcode..." />
+          <input v-model="quoteSearch" class="w-80 rounded-full border border-[#e8e2de] bg-white px-5 py-3 outline-none transition focus:border-dach-orange" placeholder="Search name or postcode..." />
         </div>
-        <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[32px] border border-[#e8e2de] bg-white">
           <table v-if="filteredQuotes.length" class="w-full text-left text-sm">
-            <thead class="bg-[#151515] text-white">
+            <thead class="bg-[#faf7f5] text-xs uppercase tracking-[0.12em] text-[#7d7773]">
               <tr>
-                <th class="px-5 py-4 font-semibold">Customer</th>
-                <th class="px-5 py-4 font-semibold">Route</th>
-                <th class="px-5 py-4 font-semibold">Service</th>
-                <th class="px-5 py-4 font-semibold">Date</th>
-                <th class="px-5 py-4 font-semibold">Status</th>
-                <th class="px-5 py-4 font-semibold">Action</th>
+                <th class="px-6 py-4 font-semibold">Customer</th>
+                <th class="px-6 py-4 font-semibold">Route</th>
+                <th class="px-6 py-4 font-semibold">Service</th>
+                <th class="px-6 py-4 font-semibold">Date</th>
+                <th class="px-6 py-4 font-semibold">Status</th>
+                <th class="px-6 py-4 font-semibold">Action</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-dach-line">
-              <tr v-for="quote in filteredQuotes" :key="quote.id" class="hover:bg-dach-cream/60">
-                <td class="px-5 py-4">
+            <tbody class="divide-y divide-[#e8e2de]">
+              <tr v-for="quote in filteredQuotes" :key="quote.id" class="hover:bg-[#faf7f5]">
+                <td class="px-6 py-5">
                   <p class="font-semibold">{{ quote.fullName || 'Website Visitor' }}</p>
                   <p class="text-dach-muted">{{ quote.phoneNumber || quote.emailAddress || 'No contact supplied' }}</p>
                 </td>
-                <td class="px-5 py-4">{{ quote.pickupPostcode || '-' }} -> {{ quote.deliveryPostcode || '-' }}</td>
-                <td class="px-5 py-4">{{ quote.serviceType || '-' }}</td>
-                <td class="px-5 py-4">{{ quote.preferredDate || 'Flexible' }}</td>
-                <td class="px-5 py-4"><span class="bg-dach-orange/10 px-3 py-1 text-xs font-bold uppercase text-dach-orange">{{ quote.status }}</span></td>
-                <td class="px-5 py-4">
-                  <button class="rounded-full bg-dach-orange px-4 py-2 text-xs font-bold text-white" type="button" @click="openBookingForm(quote)">Book</button>
+                <td class="px-6 py-5">{{ quote.pickupPostcode || '-' }} -> {{ quote.deliveryPostcode || '-' }}</td>
+                <td class="px-6 py-5">{{ quote.serviceType || '-' }}</td>
+                <td class="px-6 py-5">{{ quote.preferredDate || 'Flexible' }}</td>
+                <td class="px-6 py-5"><span class="rounded-full bg-[#fff1eb] px-3 py-1 text-xs font-semibold text-dach-orange">{{ quote.status || 'new' }}</span></td>
+                <td class="px-6 py-5">
+                  <button class="rounded-full bg-dach-black px-4 py-2 text-xs font-semibold text-white transition hover:bg-dach-orange" type="button" @click="openBookingForm(quote)">Book job</button>
                 </td>
               </tr>
             </tbody>
@@ -878,41 +911,41 @@ async function loginAdmin() {
         </div>
       </section>
 
-      <section v-if="activeAdminView === 'bookings'" class="p-9">
-        <div class="mb-6 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <button class="border border-dach-line bg-white px-4 py-3" type="button">&lt;</button>
-            <h2 class="font-google-sans text-2xl font-bold">September 2026</h2>
-            <button class="border border-dach-line bg-white px-4 py-3" type="button">&gt;</button>
+      <section v-if="activeAdminView === 'bookings'" class="p-10">
+        <div class="mb-7 flex items-end justify-between gap-6">
+          <div>
+            <p class="text-sm font-medium text-[#7d7773]">Move schedule</p>
+            <h2 class="mt-2 font-google-sans text-4xl font-semibold tracking-[-0.035em]">September 2026.</h2>
           </div>
-          <button class="rounded-full bg-dach-orange px-5 py-4 font-semibold text-white" type="button" @click="openBookingForm()"><FontAwesomeIcon icon="plus" class="mr-2" />Add Booking</button>
+          <button class="rounded-full bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black" type="button" @click="openBookingForm()"><FontAwesomeIcon icon="plus" class="mr-2" />Add Booking</button>
         </div>
-        <div class="mb-6 grid gap-5 xl:grid-cols-3">
-          <article class="border border-dach-line bg-white p-5 shadow-sm">
-            <p class="text-sm font-semibold text-dach-muted">Today's jobs</p>
-            <p class="mt-2 text-3xl font-bold">{{ todaysJobs.length }}</p>
+        <div class="mb-6 grid gap-4 xl:grid-cols-3">
+          <article class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
+            <p class="text-sm font-medium text-[#7d7773]">Today's jobs</p>
+            <p class="mt-3 font-google-sans text-4xl font-semibold tracking-[-0.03em]">{{ todaysJobs.length }}</p>
           </article>
-          <article class="border border-dach-line bg-white p-5 shadow-sm">
-            <p class="text-sm font-semibold text-dach-muted">Confirmed bookings</p>
-            <p class="mt-2 text-3xl font-bold">{{ confirmedBookings.length }}</p>
+          <article class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
+            <p class="text-sm font-medium text-[#7d7773]">Confirmed bookings</p>
+            <p class="mt-3 font-google-sans text-4xl font-semibold tracking-[-0.03em]">{{ confirmedBookings.length }}</p>
           </article>
-          <article class="border border-dach-line bg-white p-5 shadow-sm">
-            <p class="text-sm font-semibold text-dach-muted">Next move</p>
-            <p class="mt-2 text-lg font-bold">{{ nextBooking?.customerName || 'No job scheduled' }}</p>
+          <article class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
+            <p class="text-sm font-medium text-[#7d7773]">Next move</p>
+            <p class="mt-3 text-lg font-semibold">{{ nextBooking?.customerName || 'No job scheduled' }}</p>
+            <p class="mt-1 text-sm text-[#7d7773]">{{ nextBooking?.bookingDate || 'Add a booking to start planning' }}</p>
           </article>
         </div>
-        <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
-          <div class="grid grid-cols-7 border-b border-dach-line bg-[#151515] text-center text-xs font-bold uppercase tracking-[0.14em] text-white">
+        <div class="overflow-hidden rounded-[32px] border border-[#e8e2de] bg-white">
+          <div class="grid grid-cols-7 border-b border-[#e8e2de] bg-[#faf7f5] text-center text-xs font-semibold uppercase tracking-[0.12em] text-[#7d7773]">
             <span v-for="day in calendarDays" :key="day" class="py-4">{{ day }}</span>
           </div>
           <div class="grid grid-cols-7">
-            <div v-for="(cell, index) in calendarCells" :key="`${cell}-${index}`" class="min-h-32 border-r border-t border-dach-line p-3 text-sm" :class="cell === '7' && index === 7 ? 'bg-dach-orange/5 ring-1 ring-inset ring-dach-orange text-dach-orange' : 'bg-white'">
+            <div v-for="(cell, index) in calendarCells" :key="`${cell}-${index}`" class="min-h-32 border-r border-t border-[#e8e2de] p-3 text-sm" :class="cell === currentCalendarDay && index > 0 && index < 31 ? 'bg-[#fff8f5] text-dach-orange' : 'bg-white'">
               <span class="font-semibold">{{ cell }}</span>
               <div v-if="calendarCellBookings(cell, index).length" class="mt-3 grid gap-2">
                 <button
                   v-for="booking in calendarCellBookings(cell, index).slice(0, 2)"
                   :key="booking.id"
-                  class="rounded-xl bg-green-100 px-3 py-2 text-left text-xs font-semibold text-green-800"
+                  class="rounded-2xl bg-[#f4fbf6] px-3 py-2 text-left text-xs font-semibold text-green-800"
                   type="button"
                 >
                   {{ booking.customerName }}<br />
@@ -922,40 +955,55 @@ async function loginAdmin() {
             </div>
           </div>
         </div>
-        <p class="mt-5 text-sm text-dach-muted"><span class="text-dach-orange">■</span> New <span class="ml-6 text-green-600">■</span> Confirmed</p>
+        <div class="mt-6 grid gap-4 lg:grid-cols-2">
+          <article class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
+            <h3 class="font-google-sans text-lg font-semibold">Today’s job list</h3>
+            <div v-if="todaysJobs.length" class="mt-4 divide-y divide-[#e8e2de]">
+              <div v-for="booking in todaysJobs" :key="booking.id" class="py-4">
+                <p class="font-semibold">{{ booking.customerName }}</p>
+                <p class="mt-1 text-sm text-[#7d7773]">{{ booking.serviceType }} · {{ booking.pickupPostcode }} -> {{ booking.deliveryPostcode }}</p>
+              </div>
+            </div>
+            <p v-else class="mt-4 text-sm text-[#7d7773]">No jobs scheduled for today.</p>
+          </article>
+          <article class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
+            <h3 class="font-google-sans text-lg font-semibold">Booking notes</h3>
+            <p class="mt-4 text-sm leading-6 text-[#7d7773]">Use Add Booking for phone jobs, or open a quote request and book it directly. Saved bookings appear on the calendar immediately.</p>
+          </article>
+        </div>
       </section>
 
-      <div v-if="showBookingModal" class="fixed inset-0 z-50 grid place-items-center bg-dach-black/65 p-6 backdrop-blur-sm">
-        <form class="w-full max-w-3xl rounded-3xl bg-white p-7 shadow-2xl" @submit.prevent="createBooking">
-          <div class="mb-6 flex items-start justify-between gap-6 border-b border-dach-line pb-5">
+      <div v-if="showBookingModal" class="fixed inset-0 z-50 grid place-items-center bg-dach-black/40 p-6 backdrop-blur-sm">
+        <form class="w-full max-w-3xl rounded-[34px] bg-white p-7 shadow-2xl shadow-black/20" @submit.prevent="createBooking">
+          <div class="mb-6 flex items-start justify-between gap-6 border-b border-[#e8e2de] pb-5">
             <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.14em] text-dach-orange">New Move Booking</p>
-              <h2 class="mt-2 font-google-sans text-3xl font-bold">Schedule a removal job</h2>
-              <p class="mt-2 text-dach-muted">Capture the customer, route, service, date, and crew notes.</p>
+              <p class="text-sm font-medium text-[#7d7773]">New move booking</p>
+              <h2 class="mt-2 font-google-sans text-3xl font-semibold tracking-[-0.025em]">Schedule a job.</h2>
+              <p class="mt-2 text-sm text-dach-muted">Customer, route, service, date, and crew notes.</p>
             </div>
-            <button class="rounded-full border border-dach-line px-4 py-2 text-sm font-semibold text-dach-muted" type="button" @click="showBookingModal = false">Close</button>
+            <button class="rounded-full border border-[#e8e2de] px-4 py-2 text-sm font-semibold text-dach-muted" type="button" @click="showBookingModal = false">Close</button>
           </div>
 
           <div class="grid gap-4 md:grid-cols-2">
             <label class="block">
               <span class="mb-2 block text-sm font-semibold">Customer name</span>
-              <input v-model="bookingForm.customerName" required class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="e.g. Sarah Moore" />
+              <input v-model="bookingForm.customerName" required class="w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange" placeholder="e.g. Sarah Moore" />
             </label>
             <label class="block">
               <span class="mb-2 block text-sm font-semibold">Phone number</span>
-              <input v-model="bookingForm.phoneNumber" class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="+44..." />
+              <input v-model="bookingForm.phoneNumber" class="w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange" placeholder="+44..." />
             </label>
             <label class="block">
               <span class="mb-2 block text-sm font-semibold">Pickup postcode</span>
-              <input v-model="bookingForm.pickupPostcode" required class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="SW4 0EX" />
+              <input v-model="bookingForm.pickupPostcode" required class="w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange" placeholder="SW4 0EX" />
             </label>
             <label class="block">
               <span class="mb-2 block text-sm font-semibold">Delivery postcode</span>
-              <input v-model="bookingForm.deliveryPostcode" required class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="E8 1ND" />
+              <input v-model="bookingForm.deliveryPostcode" required class="w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange" placeholder="E8 1ND" />
             </label>
             <label class="block">
               <span class="mb-2 block text-sm font-semibold">Service type</span>
-              <select v-model="bookingForm.serviceType" class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange">
+              <select v-model="bookingForm.serviceType" class="w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange">
                 <option>House Move</option>
                 <option>Man and Van</option>
                 <option>Office Relocation</option>
@@ -966,13 +1014,13 @@ async function loginAdmin() {
             </label>
             <label class="block">
               <span class="mb-2 block text-sm font-semibold">Booking date</span>
-              <input v-model="bookingForm.bookingDate" required type="date" class="w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" />
+              <input v-model="bookingForm.bookingDate" required type="date" class="w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange" />
             </label>
           </div>
 
           <label class="mt-4 block">
             <span class="mb-2 block text-sm font-semibold">Crew and access notes</span>
-            <textarea v-model="bookingForm.notes" class="min-h-28 w-full rounded-2xl border border-dach-line bg-dach-cream px-4 py-4 outline-none focus:border-dach-orange" placeholder="Stairs, lift, parking, fragile items, van size, crew size..." />
+            <textarea v-model="bookingForm.notes" class="min-h-28 w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-4 outline-none transition focus:border-dach-orange" placeholder="Stairs, lift, parking, fragile items, van size, crew size..." />
           </label>
 
           <p v-if="bookingError" class="mt-4 rounded-2xl bg-dach-orange/10 px-4 py-3 text-sm font-semibold text-dach-orange">{{ bookingError }}</p>
@@ -986,17 +1034,17 @@ async function loginAdmin() {
         </form>
       </div>
 
-      <section v-if="activeAdminView === 'messages'" class="p-9">
+      <section v-if="activeAdminView === 'messages'" class="p-10">
         <div class="mb-6 flex items-end justify-between">
           <div>
-            <h2 class="font-google-sans text-2xl font-bold">Customer Messages</h2>
-            <p class="mt-1 text-dach-muted">{{ unreadMessages.length }} unread</p>
+            <p class="text-sm font-medium text-[#7d7773]">Inbox</p>
+            <h2 class="mt-2 font-google-sans text-4xl font-semibold tracking-[-0.035em]">Customer messages.</h2>
           </div>
         </div>
-        <div class="grid min-h-[620px] grid-cols-[380px_1fr] overflow-hidden border border-dach-line bg-white shadow-sm">
-          <div class="border-r border-dach-line">
-            <div v-if="messages.length" class="divide-y divide-dach-line">
-              <button v-for="message in messages" :key="message.id" class="block w-full p-5 text-left hover:bg-dach-cream/60" type="button">
+        <div class="grid min-h-[620px] grid-cols-[380px_1fr] overflow-hidden rounded-[32px] border border-[#e8e2de] bg-white">
+          <div class="border-r border-[#e8e2de]">
+            <div v-if="messages.length" class="divide-y divide-[#e8e2de]">
+              <button v-for="message in messages" :key="message.id" class="block w-full p-5 text-left transition hover:bg-[#faf7f5]" type="button">
                 <p class="font-semibold">{{ message.senderName }}</p>
                 <p class="mt-1 text-sm text-dach-muted">{{ message.subject }}</p>
               </button>
@@ -1014,34 +1062,34 @@ async function loginAdmin() {
         </div>
       </section>
 
-      <section v-if="activeAdminView === 'content'" class="p-9">
+      <section v-if="activeAdminView === 'content'" class="p-10">
         <div class="mb-6">
-          <h2 class="font-google-sans text-2xl font-bold">Business Setup</h2>
-          <p class="mt-1 text-dach-muted">Keep quote handling, contact details, and operations rules in one place.</p>
+          <p class="text-sm font-medium text-[#7d7773]">Settings</p>
+          <h2 class="mt-2 font-google-sans text-4xl font-semibold tracking-[-0.035em]">Business setup.</h2>
         </div>
         <div class="grid grid-cols-[300px_1fr] gap-6">
-          <div class="overflow-hidden border border-dach-line bg-white shadow-sm">
+          <div class="overflow-hidden rounded-[28px] border border-[#e8e2de] bg-white">
             <button
               v-for="item in availableContentSections"
               :key="item.label"
-              class="block w-full border-b border-dach-line p-5 text-left transition hover:bg-dach-cream/60"
-              :class="selectedContent === item.id ? 'bg-dach-orange text-white hover:bg-dach-orange' : ''"
+              class="block w-full border-b border-[#e8e2de] p-5 text-left transition hover:bg-[#faf7f5]"
+              :class="selectedContent === item.id ? 'bg-[#fff1eb] text-dach-orange hover:bg-[#fff1eb]' : ''"
               type="button"
               @click="selectedContent = item.id"
             >
               <strong>{{ item.label }}</strong>
-              <span class="mt-1 block text-sm" :class="selectedContent === item.id ? 'text-white/70' : 'text-dach-muted'">{{ Object.keys(item.fields || {}).length || 0 }} settings</span>
+              <span class="mt-1 block text-sm text-dach-muted">{{ Object.keys(item.fields || {}).length || 0 }} settings</span>
             </button>
           </div>
-          <div class="min-h-72 border border-dach-line bg-white p-7 shadow-sm">
+          <div class="min-h-72 rounded-[28px] border border-[#e8e2de] bg-white p-7">
             <template v-if="selectedContentSection">
-              <div class="mb-6 flex items-center justify-between border-b border-dach-line pb-5">
-                <h3 class="font-google-sans text-xl font-bold">{{ selectedContentSection.label }}</h3>
-                <button class="bg-dach-orange px-4 py-3 text-sm font-semibold text-white" type="button">Save Changes</button>
+              <div class="mb-6 flex items-center justify-between border-b border-[#e8e2de] pb-5">
+                <h3 class="font-google-sans text-xl font-semibold">{{ selectedContentSection.label }}</h3>
+                <button class="rounded-full bg-dach-orange px-4 py-3 text-sm font-semibold text-white" type="button">Save Changes</button>
               </div>
               <label v-for="(value, key) in selectedContentSection.fields" :key="key" class="mb-5 block">
-                <span class="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-dach-muted">{{ key }}</span>
-                <textarea class="min-h-24 w-full border border-dach-line bg-dach-cream px-4 py-3 outline-none focus:border-dach-orange" :value="value" />
+                <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-dach-muted">{{ key }}</span>
+                <textarea class="min-h-24 w-full rounded-2xl border border-[#e8e2de] bg-white px-4 py-3 outline-none transition focus:border-dach-orange" :value="value" />
               </label>
             </template>
             <p v-else class="text-dach-muted">Select a section on the left to edit.</p>
