@@ -8,6 +8,8 @@ const router = useRouter()
 const config = useRuntimeConfig()
 const openFaq = ref(0)
 const currentHeroSlide = ref(0)
+const quoteSubmitting = ref(false)
+const quoteMessage = ref('')
 const adminLoading = ref(false)
 const loginError = ref('')
 const quoteSearch = ref('')
@@ -287,23 +289,32 @@ function calendarCellBookings(cell: string, index: number) {
 }
 
 async function submitQuote() {
-  await $fetch(`${apiBase.value}/api/quotes`, {
-    method: 'POST',
-    body: {
-      fullName: 'Website Visitor',
-      phoneNumber: '',
-      emailAddress: '',
-      serviceType: quoteForm.serviceType,
-      pickupPostcode: quoteForm.pickupPostcode,
-      deliveryPostcode: quoteForm.deliveryPostcode,
-      preferredDate: quoteForm.preferredDate,
-      flexibleOnDate: true,
-      additionalNotes: 'Submitted from landing quote form.',
-    },
-  })
-  quoteForm.pickupPostcode = ''
-  quoteForm.deliveryPostcode = ''
-  quoteForm.preferredDate = ''
+  quoteSubmitting.value = true
+  quoteMessage.value = ''
+  try {
+    await $fetch(`${apiBase.value}/api/quotes`, {
+      method: 'POST',
+      body: {
+        fullName: 'Website Visitor',
+        phoneNumber: '',
+        emailAddress: '',
+        serviceType: quoteForm.serviceType,
+        pickupPostcode: quoteForm.pickupPostcode,
+        deliveryPostcode: quoteForm.deliveryPostcode,
+        preferredDate: quoteForm.preferredDate,
+        flexibleOnDate: true,
+        additionalNotes: 'Submitted from landing quote form.',
+      },
+    })
+    quoteForm.pickupPostcode = ''
+    quoteForm.deliveryPostcode = ''
+    quoteForm.preferredDate = ''
+    quoteMessage.value = 'Thanks. We will confirm your quote shortly.'
+  } catch (error) {
+    quoteMessage.value = `Please call ${brand.phone} and we will take the details now.`
+  } finally {
+    quoteSubmitting.value = false
+  }
 }
 
 function openBookingForm(quote?: QuoteRequest) {
@@ -373,24 +384,24 @@ async function loginAdmin() {
   </div>
 
   <main v-if="!isAdminRoute" class="min-h-screen bg-white text-dach-black">
-    <header class="sticky top-0 z-50 border-b border-dach-line bg-white/95 backdrop-blur">
-      <div class="section-wrap flex h-20 items-center justify-between">
+    <header class="sticky top-0 z-50 border-b border-[#e8e2de] bg-white/95 backdrop-blur">
+      <div class="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-6">
         <a href="#" class="flex items-center">
-          <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-auto object-contain" />
+          <img src="/images/logo.jpg" alt="Dach Removals" class="h-11 w-auto object-contain" />
         </a>
 
-        <nav class="hidden items-center gap-8 text-sm font-semibold lg:flex">
+        <nav class="hidden items-center gap-7 text-sm font-semibold text-[#5f5a56] lg:flex">
           <a v-for="item in navigation" :key="item.href" :href="item.href" class="transition hover:text-dach-orange">
             {{ item.label }}
           </a>
         </nav>
 
         <div class="flex items-center gap-3">
-          <a :href="`tel:${brand.phone}`" class="hidden items-center gap-3 rounded-full bg-dach-cream px-5 py-3 text-sm font-semibold md:flex">
+          <a :href="`tel:${brand.phone}`" class="hidden items-center gap-2 rounded-full border border-[#e8e2de] px-4 py-2.5 text-sm font-semibold md:flex">
             <FontAwesomeIcon icon="phone" />
             {{ brand.phone }}
           </a>
-          <a href="/admin" class="rounded-full bg-dach-orange px-5 py-3 text-sm font-semibold text-white transition hover:bg-dach-black">Log In</a>
+          <a href="#quote" class="rounded-full bg-dach-orange px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-dach-black">Get Quote</a>
         </div>
       </div>
     </header>
@@ -404,12 +415,11 @@ async function loginAdmin() {
         class="absolute inset-0 -z-20 h-full w-full object-cover transition duration-1000"
         :class="[slide.position, currentHeroSlide === index ? 'scale-100 opacity-100' : 'scale-105 opacity-0']"
       />
-      <div class="absolute inset-0 -z-10 bg-gradient-to-r from-dach-black/88 via-dach-black/58 to-dach-black/18" />
-      <div class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-dach-black/60 to-transparent" />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-r from-black/82 via-black/42 to-black/12" />
 
       <Motion
         as="div"
-        class="section-wrap relative grid min-h-[700px] items-center gap-12 py-20 lg:grid-cols-[0.92fr_430px]"
+        class="mx-auto grid min-h-[720px] w-full max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-[1fr_420px]"
         :initial="{ opacity: 0 }"
         :animate="{ opacity: 1 }"
         :transition="{ duration: 0.5, ease: 'easeOut' }"
@@ -417,22 +427,22 @@ async function loginAdmin() {
         <Motion
           as="div"
           class="max-w-2xl"
-          :initial="{ opacity: 0, y: 24 }"
+          :initial="{ opacity: 0, y: 22 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut' }"
         >
-          <div class="mb-7 flex flex-wrap gap-2">
-            <span v-for="badge in trustBadges" :key="badge" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
+          <div class="mb-8 flex flex-wrap gap-2">
+            <span v-for="badge in trustBadges.slice(0, 3)" :key="badge" class="rounded-full border border-white/18 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">{{ badge }}</span>
           </div>
-          <h1 class="max-w-3xl text-5xl font-bold leading-[1.02] tracking-tight md:text-7xl">
-            UK removals, <span class="text-dach-orange">made simple.</span>
+          <h1 class="font-google-sans text-5xl font-semibold leading-[1.02] tracking-[-0.045em] md:text-7xl">
+            Removals made simple.
           </h1>
-          <p class="mt-5 max-w-xl text-lg leading-8 text-white/82">Fast quotes. Careful movers. Clear pricing.</p>
+          <p class="mt-5 max-w-lg text-lg leading-8 text-white/80">Fast quotes, careful movers, clear pricing.</p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <a href="#quote" class="rounded-full bg-dach-orange px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
+            <a href="#quote" class="rounded-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               Get a Quote <FontAwesomeIcon icon="arrow-right" class="ml-2" />
             </a>
-            <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/25 px-5 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
+            <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/25 px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
               <FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}
             </a>
           </div>
@@ -440,8 +450,8 @@ async function loginAdmin() {
             <button
               v-for="(slide, index) in heroSlides"
               :key="`dot-${slide.title}`"
-              class="h-1.5 w-10 transition"
-              :class="currentHeroSlide === index ? 'bg-dach-orange' : 'bg-white/25'"
+              class="h-1.5 w-10 rounded-full transition"
+              :class="currentHeroSlide === index ? 'bg-dach-orange' : 'bg-white/30'"
               type="button"
               :aria-label="`Show ${slide.title}`"
               @click="currentHeroSlide = index"
@@ -452,241 +462,224 @@ async function loginAdmin() {
         <Motion
           id="quote"
           as="form"
-          class="relative z-10 rounded-3xl border border-white/25 bg-dach-black/35 p-7 text-white shadow-2xl shadow-black/35 backdrop-blur-md"
-          :initial="{ opacity: 0, y: 26 }"
+          class="rounded-[34px] border border-white/20 bg-white/16 p-6 text-white backdrop-blur-xl"
+          :initial="{ opacity: 0, y: 24 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
           @submit.prevent="submitQuote"
         >
-          <h2 class="text-2xl font-bold tracking-tight">Get Your Price</h2>
-          <p class="mt-2 text-sm text-white/75">Enter your details. We confirm the rest.</p>
+          <h2 class="font-google-sans text-2xl font-semibold tracking-[-0.02em]">Get your price</h2>
+          <p class="mt-2 text-sm text-white/72">Enter the route. We confirm the move.</p>
 
           <label class="mt-6 block text-sm font-semibold">Moving From</label>
-          <div class="mt-2 flex items-center gap-3 rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white/75">
+          <div class="mt-2 flex items-center gap-3 rounded-2xl border border-white/16 bg-white/14 px-4 py-4 text-white/75">
             <FontAwesomeIcon icon="location-dot" />
-            <input v-model="quoteForm.pickupPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Enter postcode" />
+            <input v-model="quoteForm.pickupPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Postcode" />
           </div>
 
           <label class="mt-4 block text-sm font-semibold">Moving To</label>
-          <div class="mt-2 flex items-center gap-3 rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white/75">
+          <div class="mt-2 flex items-center gap-3 rounded-2xl border border-white/16 bg-white/14 px-4 py-4 text-white/75">
             <FontAwesomeIcon icon="route" />
-            <input v-model="quoteForm.deliveryPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Enter postcode" />
+            <input v-model="quoteForm.deliveryPostcode" class="w-full bg-transparent text-white outline-none placeholder:text-white/55" placeholder="Postcode" />
           </div>
 
           <div class="mt-4 grid gap-3 md:grid-cols-2">
-            <select v-model="quoteForm.serviceType" class="rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white outline-none">
+            <select v-model="quoteForm.serviceType" class="rounded-2xl border border-white/16 bg-white/14 px-4 py-4 text-white outline-none">
               <option>House Move</option>
               <option>Man and Van</option>
               <option>Office Relocation</option>
               <option>Packing and Storage</option>
             </select>
-            <input v-model="quoteForm.preferredDate" class="rounded-2xl border border-white/15 bg-white/15 px-4 py-4 text-white outline-none placeholder:text-white/55" placeholder="dd/mm/yyyy" />
+            <input v-model="quoteForm.preferredDate" class="rounded-2xl border border-white/16 bg-white/14 px-4 py-4 text-white outline-none placeholder:text-white/55" placeholder="Preferred date" />
           </div>
 
-          <button class="mt-6 w-full rounded-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black">
-            See Price Instantly <FontAwesomeIcon icon="arrow-right" class="ml-2" />
+          <button class="mt-6 w-full rounded-full bg-dach-orange px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-dach-black" :disabled="quoteSubmitting">
+            {{ quoteSubmitting ? 'Sending...' : 'See Price' }} <FontAwesomeIcon icon="arrow-right" class="ml-2" />
           </button>
-          <p class="mt-4 text-center text-sm text-white/75"><FontAwesomeIcon icon="lock" class="mr-1" /> Secure enquiry. Rated 4.8/5.</p>
+          <p v-if="quoteMessage" class="mt-4 rounded-2xl bg-white/14 px-4 py-3 text-sm text-white">{{ quoteMessage }}</p>
         </Motion>
       </Motion>
     </section>
 
-    <section id="how-it-works" class="section-wrap relative overflow-hidden py-24">
-      <span class="route-lines right-0 top-10 opacity-50" />
-      <span class="corner-mark bottom-12 left-0 opacity-60" />
+    <section id="how-it-works" class="mx-auto w-full max-w-7xl px-6 py-24">
       <Motion
         as="div"
-        class="grid gap-6 lg:grid-cols-[0.75fr_1fr] lg:items-end"
-        :initial="{ opacity: 0, y: 28 }"
+        class="max-w-2xl"
+        :initial="{ opacity: 0, y: 24 }"
         :whileInView="{ opacity: 1, y: 0 }"
         :inViewOptions="{ once: true, margin: '-80px' }"
         :transition="{ duration: 0.5, ease: 'easeOut' }"
       >
-        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">How it works.</h2>
-        <p class="text-lg leading-8 text-dach-muted">Five quick steps from quote to moving day.</p>
+        <h2 class="font-google-sans text-4xl font-semibold tracking-[-0.035em] md:text-5xl">A simpler move.</h2>
+        <p class="mt-4 text-lg text-[#6f6a67]">Quote, confirm, move.</p>
       </Motion>
-      <div class="mt-12 grid gap-5 md:grid-cols-5">
+      <div class="mt-10 grid gap-4 md:grid-cols-5">
         <Motion
           v-for="(step, index) in quoteSteps"
           :key="step.title"
           as="article"
-          class="rounded-3xl border border-dach-line bg-white p-6 shadow-sm"
-          :initial="{ opacity: 0, y: 26 }"
+          class="rounded-[28px] border border-[#e8e2de] bg-white p-5"
+          :initial="{ opacity: 0, y: 22 }"
           :whileInView="{ opacity: 1, y: 0 }"
           :inViewOptions="{ once: true, margin: '-70px' }"
-          :whileHover="{ y: -5 }"
-          :transition="{ duration: 0.45, ease: 'easeOut', delay: index * 0.05 }"
+          :whileHover="{ y: -4 }"
+          :transition="{ duration: 0.4, ease: 'easeOut', delay: index * 0.04 }"
         >
-          <span class="mb-7 flex h-11 w-11 items-center justify-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="step.icon" /></span>
-          <span class="text-sm font-semibold text-dach-muted">0{{ index + 1 }}</span>
-          <h3 class="mt-3 text-lg font-bold">{{ step.title }}</h3>
-          <p class="mt-3 text-sm leading-6 text-dach-muted">{{ step.copy }}</p>
+          <span class="mb-6 grid h-11 w-11 place-items-center rounded-2xl bg-[#fff1eb] text-dach-orange"><FontAwesomeIcon :icon="step.icon" /></span>
+          <span class="text-sm text-[#8b8581]">0{{ index + 1 }}</span>
+          <h3 class="mt-3 font-google-sans text-lg font-semibold">{{ step.title }}</h3>
+          <p class="mt-2 text-sm text-[#6f6a67]">{{ step.copy }}</p>
         </Motion>
       </div>
     </section>
 
-    <section id="services" class="relative overflow-hidden border-y border-dach-line bg-white py-20">
-      <div class="abstract-grid absolute inset-y-0 right-0 w-1/2 opacity-50" />
-      <div class="section-wrap relative">
+    <section id="services" class="mx-auto w-full max-w-7xl px-6 pb-24">
+      <Motion
+        as="div"
+        class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end"
+        :initial="{ opacity: 0, y: 24 }"
+        :whileInView="{ opacity: 1, y: 0 }"
+        :inViewOptions="{ once: true, margin: '-80px' }"
+        :transition="{ duration: 0.5, ease: 'easeOut' }"
+      >
+        <h2 class="font-google-sans text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Services.</h2>
+        <p class="max-w-lg text-[#6f6a67]">Home, office, student, furniture, packing, and storage.</p>
+      </Motion>
+
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <Motion
-          as="div"
-          class="grid gap-4 lg:grid-cols-[0.7fr_1fr] lg:items-end"
+          v-for="(service, index) in services"
+          :key="service.title"
+          as="article"
+          class="group overflow-hidden rounded-[32px] border border-[#e8e2de] bg-white transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-100/50"
           :initial="{ opacity: 0, y: 28 }"
           :whileInView="{ opacity: 1, y: 0 }"
-          :inViewOptions="{ once: true, margin: '-80px' }"
-          :transition="{ duration: 0.5, ease: 'easeOut' }"
+          :inViewOptions="{ once: true, margin: '-70px' }"
+          :transition="{ duration: 0.42, ease: 'easeOut', delay: index * 0.035 }"
         >
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Services.</h2>
-          <p class="max-w-xl text-lg leading-8 text-dach-muted">Home, office, student, furniture, packing, and storage moves.</p>
+          <img v-if="index < 2" :src="service.image" :alt="service.title" class="h-56 w-full object-cover" />
+          <div class="p-6">
+            <span class="grid h-11 w-11 place-items-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
+            <h3 class="mt-6 font-google-sans text-2xl font-semibold tracking-[-0.025em]">{{ service.title }}</h3>
+            <p class="mt-3 text-[#6f6a67]">{{ service.description }}</p>
+            <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
+          </div>
         </Motion>
-
-        <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          <Motion
-            v-for="(service, index) in services"
-            :key="service.title"
-            as="article"
-            class="relative overflow-hidden rounded-3xl border border-dach-line bg-white shadow-sm transition hover:shadow-xl hover:shadow-orange-100"
-            :initial="{ opacity: 0, y: 30 }"
-            :whileInView="{ opacity: 1, y: 0 }"
-            :inViewOptions="{ once: true, margin: '-70px' }"
-            :whileHover="{ y: -6 }"
-            :transition="{ duration: 0.45, ease: 'easeOut', delay: index * 0.04 }"
-          >
-            <img v-if="index < 2" :src="service.image" :alt="service.title" class="h-44 w-full object-cover" />
-            <div class="p-6">
-              <span class="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-dach-orange text-white"><FontAwesomeIcon :icon="service.icon" /></span>
-              <h3 class="text-xl font-bold">{{ service.title }}</h3>
-              <p class="mt-3 min-h-14 leading-7 text-dach-muted">{{ service.description }}</p>
-              <ul v-if="index < 2" class="mt-4 grid gap-2 text-sm text-dach-muted">
-                <li v-for="item in service.idealFor.slice(0, 3)" :key="item"><FontAwesomeIcon icon="check" class="mr-2 text-dach-orange" />{{ item }}</li>
-              </ul>
-              <a href="#quote" class="mt-6 inline-flex items-center gap-2 font-semibold text-dach-orange">Get Quote <FontAwesomeIcon icon="arrow-right" /></a>
-            </div>
-          </Motion>
-        </div>
       </div>
     </section>
 
-    <section id="areas" class="relative overflow-hidden border-y border-dach-line bg-gray-50 py-24">
-      <span class="route-lines left-10 top-24 opacity-40" />
-      <div class="section-wrap grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+    <section id="areas" class="border-y border-[#e8e2de] bg-white py-24">
+      <div class="mx-auto grid w-full max-w-7xl gap-10 px-6 lg:grid-cols-[0.8fr_1.2fr]">
         <Motion
           as="div"
-          :initial="{ opacity: 0, x: -28 }"
+          :initial="{ opacity: 0, x: -24 }"
           :whileInView="{ opacity: 1, x: 0 }"
           :inViewOptions="{ once: true, margin: '-80px' }"
           :transition="{ duration: 0.5, ease: 'easeOut' }"
         >
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Areas we cover.</h2>
-          <p class="mt-5 leading-8 text-dach-muted">Local and long-distance removals across the UK.</p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <span v-for="routePair in routePairs" :key="routePair" class="rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-sm">{{ routePair }}</span>
+          <h2 class="font-google-sans text-4xl font-semibold tracking-[-0.035em] md:text-5xl">UK coverage.</h2>
+          <p class="mt-4 max-w-md text-lg leading-8 text-[#6f6a67]">Local and long-distance moves across major UK regions.</p>
+          <div class="mt-8 flex flex-wrap gap-2">
+            <span v-for="routePair in routePairs.slice(0, 4)" :key="routePair" class="rounded-full border border-[#e8e2de] px-4 py-2 text-sm font-semibold">{{ routePair }}</span>
           </div>
         </Motion>
-        <div class="grid gap-5 md:grid-cols-2">
+        <div class="grid gap-4 md:grid-cols-2">
           <Motion
-            v-for="([area, cities], index) in areas"
+            v-for="([area, cities], index) in areas.slice(0, 4)"
             :key="area"
             as="article"
-            class="rounded-3xl bg-white p-6 shadow-sm"
-            :initial="{ opacity: 0, y: 24 }"
+            class="rounded-[28px] border border-[#e8e2de] bg-white p-6"
+            :initial="{ opacity: 0, y: 22 }"
             :whileInView="{ opacity: 1, y: 0 }"
             :inViewOptions="{ once: true, margin: '-70px' }"
-            :whileHover="{ y: -4 }"
-            :transition="{ duration: 0.42, ease: 'easeOut', delay: index * 0.04 }"
+            :whileHover="{ y: -3 }"
+            :transition="{ duration: 0.4, ease: 'easeOut', delay: index * 0.04 }"
           >
-            <h3 class="text-lg font-bold"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />{{ area }}</h3>
-            <ul class="mt-4 grid gap-2 text-sm text-dach-muted">
-              <li v-for="city in cities" :key="city">-> {{ city }}</li>
-            </ul>
+            <h3 class="font-google-sans text-lg font-semibold"><FontAwesomeIcon icon="route" class="mr-2 text-dach-orange" />{{ area }}</h3>
+            <p class="mt-3 text-sm leading-7 text-[#6f6a67]">{{ cities.slice(0, 4).join(', ') }}</p>
           </Motion>
         </div>
       </div>
+    </section>
+
+    <section class="mx-auto w-full max-w-7xl px-6 py-24">
+      <Motion
+        as="div"
+        class="grid gap-5 md:grid-cols-4"
+        :initial="{ opacity: 0, y: 24 }"
+        :whileInView="{ opacity: 1, y: 0 }"
+        :inViewOptions="{ once: true, margin: '-80px' }"
+        :transition="{ duration: 0.5, ease: 'easeOut' }"
+      >
+        <article v-for="review in testimonials" :key="review[0]" class="rounded-[28px] border border-[#e8e2de] bg-white p-6">
+          <p class="text-dach-orange"><FontAwesomeIcon v-for="star in 5" :key="star" icon="star" class="mr-1 text-xs" /></p>
+          <p class="mt-5 text-sm leading-7 text-[#34302d]">{{ review[2] }}</p>
+          <p class="mt-6 font-semibold">{{ review[0] }}</p>
+          <p class="text-sm text-[#7d7773]">{{ review[1] }}</p>
+        </article>
+      </Motion>
     </section>
 
     <Motion
       id="faq"
       as="section"
-      class="section-wrap grid gap-10 py-24 lg:grid-cols-[0.7fr_1.3fr]"
-      :initial="{ opacity: 0, y: 28 }"
+      class="mx-auto grid w-full max-w-7xl gap-10 px-6 pb-24 lg:grid-cols-[0.75fr_1.25fr]"
+      :initial="{ opacity: 0, y: 24 }"
       :whileInView="{ opacity: 1, y: 0 }"
       :inViewOptions="{ once: true, margin: '-80px' }"
       :transition="{ duration: 0.5, ease: 'easeOut' }"
     >
       <div>
-        <h2 class="text-4xl font-bold tracking-tight md:text-5xl">FAQ.</h2>
-        <p class="mt-5 leading-8 text-dach-muted">Quick answers before you book.</p>
-        <p class="mt-8 font-semibold">Need help? <a :href="`mailto:${brand.email}`" class="text-dach-orange">{{ brand.email }}</a></p>
+        <h2 class="font-google-sans text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Questions.</h2>
+        <p class="mt-4 text-[#6f6a67]">Need help? <a :href="`mailto:${brand.email}`" class="text-dach-orange">{{ brand.email }}</a></p>
       </div>
       <div class="space-y-3">
-        <Motion
-          v-for="(faq, index) in faqs"
-          :key="faq"
-          as="article"
-          class="overflow-hidden rounded-2xl border border-dach-line"
-          :initial="{ opacity: 0, x: 18 }"
-          :whileInView="{ opacity: 1, x: 0 }"
-          :inViewOptions="{ once: true, margin: '-70px' }"
-          :transition="{ duration: 0.35, ease: 'easeOut', delay: index * 0.04 }"
-        >
+        <article v-for="(faq, index) in faqs" :key="faq" class="overflow-hidden rounded-[24px] border border-[#e8e2de] bg-white">
           <button class="flex w-full items-center justify-between p-5 text-left font-semibold" @click="openFaq = openFaq === index ? -1 : index">
             {{ faq }}
             <FontAwesomeIcon :icon="openFaq === index ? 'chevron-down' : 'arrow-right'" class="text-dach-orange" />
           </button>
-          <p v-if="openFaq === index" class="px-5 pb-5 leading-7 text-dach-muted">
-            Send the quote form or call us. We will confirm the right service and availability.
+          <p v-if="openFaq === index" class="px-5 pb-5 leading-7 text-[#6f6a67]">
+            Send the form or call us. We will confirm the right service and availability.
           </p>
-        </Motion>
+        </article>
       </div>
     </Motion>
 
-    <section class="relative overflow-hidden bg-dach-black py-20 text-white">
-      <span class="corner-mark right-24 top-8 border-white/15 opacity-60" />
+    <section class="relative isolate overflow-hidden bg-dach-black py-20 text-white">
+      <img src="/images/hero-removals-3.png" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover opacity-45" />
+      <div class="absolute inset-0 -z-10 bg-black/70" />
       <Motion
         as="div"
-        class="section-wrap grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center"
-        :initial="{ opacity: 0, y: 28 }"
+        class="mx-auto flex w-full max-w-7xl flex-col justify-between gap-8 px-6 md:flex-row md:items-center"
+        :initial="{ opacity: 0, y: 24 }"
         :whileInView="{ opacity: 1, y: 0 }"
         :inViewOptions="{ once: true, margin: '-80px' }"
         :transition="{ duration: 0.5, ease: 'easeOut' }"
       >
         <div>
-          <h2 class="text-4xl font-bold tracking-tight md:text-5xl">Ready to move?</h2>
-          <p class="mt-4 max-w-2xl leading-8 text-white/70">Get a quote or call the team.</p>
+          <h2 class="font-google-sans text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Ready to move?</h2>
+          <p class="mt-4 text-white/70">Get a quote or call the team.</p>
         </div>
         <div class="flex flex-wrap gap-3">
           <a href="#quote" class="rounded-full bg-dach-orange px-6 py-4 font-semibold text-white">Get a Quote</a>
-          <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/20 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
+          <a :href="`tel:${brand.phone}`" class="rounded-full border border-white/25 px-6 py-4 font-semibold text-white"><FontAwesomeIcon icon="phone" class="mr-2" />{{ brand.phone }}</a>
         </div>
       </Motion>
     </section>
 
-    <footer class="relative overflow-hidden bg-[#101010] py-16 text-white">
-      <img src="/images/hero-removals.png" alt="" class="absolute inset-0 h-full w-full object-cover opacity-20" />
-      <div class="absolute inset-0 bg-gradient-to-r from-[#101010] via-[#101010]/92 to-[#101010]/78" />
-      <div class="absolute inset-0 bg-dach-black/55" />
-      <div class="section-wrap relative grid gap-10 md:grid-cols-4">
+    <footer class="bg-white py-12">
+      <div class="mx-auto grid w-full max-w-7xl gap-8 px-6 md:grid-cols-[1fr_auto_auto] md:items-start">
         <div>
-          <img src="/images/logo.jpg" alt="Dach Removals" class="mb-5 h-12 w-auto bg-white object-contain" />
-          <p class="text-white/60">UK removals. Clear pricing. Careful crews.</p>
+          <img src="/images/logo.jpg" alt="Dach Removals" class="h-11 w-auto object-contain" />
+          <p class="mt-5 max-w-sm text-[#6f6a67]">UK removals. Clear pricing. Careful crews.</p>
         </div>
-        <div>
-          <h3 class="font-semibold">Services</h3>
-          <p v-for="service in services.slice(0, 5)" :key="service.title" class="mt-3 text-white/55">{{ service.title }}</p>
+        <div class="text-sm text-[#6f6a67]">
+          <p class="font-semibold text-dach-black">Contact</p>
+          <p class="mt-3">{{ brand.phone }}</p>
+          <p class="mt-2">{{ brand.email }}</p>
         </div>
-        <div>
-          <h3 class="font-semibold">Company</h3>
-          <p class="mt-3 text-white/55">About Us</p>
-          <p class="mt-3 text-white/55">Reviews</p>
-          <p class="mt-3 text-white/55">Get a Quote</p>
-          <p class="mt-3 text-white/55">Help Centre</p>
-        </div>
-        <div>
-          <h3 class="font-semibold">Contact</h3>
-          <p class="mt-3 text-white/55">{{ brand.phone }}</p>
-          <p class="mt-3 text-white/55">{{ brand.email }}</p>
-          <p class="mt-8 text-white/35">© 2026 Dach Removals.</p>
-        </div>
+        <p class="text-sm text-[#8b8581]">© 2026 Dach Removals.</p>
       </div>
     </footer>
   </main>
