@@ -684,47 +684,50 @@ async function loginAdmin() {
     </footer>
   </main>
 
-  <div v-else-if="activeAdminView === 'login'" class="relative isolate min-h-screen overflow-hidden bg-dach-black text-white">
-    <img src="/images/hero-removals-2.png" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover opacity-70" />
-    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-dach-black via-dach-black/80 to-dach-black/45" />
-    <div class="abstract-grid absolute inset-0 -z-10 opacity-20" />
-    <span class="corner-mark left-16 top-16 border-white/20" />
-
-    <div class="mx-auto grid min-h-screen w-full max-w-6xl items-center gap-12 px-6 py-12 lg:grid-cols-[1fr_440px]">
+  <div v-else-if="activeAdminView === 'login'" class="min-h-screen bg-white text-dach-black">
+    <div class="mx-auto grid min-h-screen w-full max-w-7xl gap-8 px-6 py-6 lg:grid-cols-[1.05fr_0.95fr]">
       <Motion
         as="section"
-        class="max-w-xl"
+        class="relative hidden overflow-hidden rounded-[36px] bg-dach-black text-white lg:block"
         :initial="{ opacity: 0, x: -28 }"
         :animate="{ opacity: 1, x: 0 }"
         :transition="{ duration: 0.55, ease: 'easeOut' }"
       >
-        <img src="/images/logo.jpg" alt="Dach Removals" class="h-14 w-auto rounded-xl bg-white object-contain" />
-        <p class="mt-8 text-sm font-semibold uppercase tracking-[0.18em] text-dach-orange">Operations Portal</p>
-        <h1 class="mt-4 max-w-lg text-5xl font-bold leading-tight">Manage quotes, bookings, and move-day work.</h1>
-        <p class="mt-5 max-w-lg text-lg leading-8 text-white/70">For the Dach Removals team only. Keep customer requests, schedules, and dispatch notes organised.</p>
+        <img src="/images/hero-removals-2.png" alt="" class="absolute inset-0 h-full w-full object-cover opacity-70" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/82 via-black/28 to-transparent" />
+        <div class="relative flex h-full min-h-[calc(100vh-48px)] flex-col justify-between p-10">
+          <img src="/images/logo.jpg" alt="Dach Removals" class="h-12 w-fit rounded-2xl bg-white object-contain" />
+          <div class="max-w-lg">
+            <p class="text-sm font-semibold text-white/70">Dach Removals admin</p>
+            <h1 class="mt-4 font-google-sans text-5xl font-semibold leading-tight tracking-[-0.045em]">Quotes, bookings, and move-day operations.</h1>
+          </div>
+        </div>
       </Motion>
 
       <Motion
         as="form"
-        class="rounded-3xl border border-white/18 bg-white/12 p-8 shadow-2xl shadow-black/40 backdrop-blur-xl"
+        class="mx-auto flex w-full max-w-md flex-col justify-center py-10"
         :initial="{ opacity: 0, y: 28 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.55, ease: 'easeOut', delay: 0.08 }"
         @submit.prevent="loginAdmin"
       >
-        <div class="mb-8">
-          <p class="text-sm font-semibold text-white/60">Secure sign in</p>
-          <h2 class="mt-2 font-google-sans text-3xl font-bold">Admin access</h2>
+        <img src="/images/logo.jpg" alt="Dach Removals" class="mb-14 h-12 w-fit object-contain lg:hidden" />
+        <div class="mb-10">
+          <p class="text-sm font-medium text-[#7d7773]">Admin portal</p>
+          <h2 class="mt-3 font-google-sans text-4xl font-semibold tracking-[-0.04em]">Sign in.</h2>
+          <p class="mt-3 text-[#6f6a67]">Manage quote requests, bookings, messages, and dispatch notes.</p>
         </div>
-        <label class="text-xs font-bold uppercase tracking-[0.18em] text-white/55">Username</label>
-        <input v-model="adminLogin.username" class="mt-2 w-full rounded-2xl border border-white/14 bg-white/14 px-5 py-4 text-white outline-none placeholder:text-white/45 focus:border-dach-orange" />
-        <label class="mt-5 block text-xs font-bold uppercase tracking-[0.18em] text-white/55">Password</label>
-        <input v-model="adminLogin.password" type="password" class="mt-2 w-full rounded-2xl border border-white/14 bg-white/14 px-5 py-4 text-white outline-none placeholder:text-white/45 focus:border-dach-orange" />
-        <button class="mt-6 block w-full rounded-full bg-dach-orange px-6 py-4 text-center font-bold text-white transition hover:bg-white hover:text-dach-black" type="submit">
+
+        <label class="text-sm font-semibold">Username</label>
+        <input v-model="adminLogin.username" class="mt-2 w-full rounded-2xl border border-[#e8e2de] bg-white px-5 py-4 outline-none transition focus:border-dach-orange" autocomplete="username" />
+        <label class="mt-5 block text-sm font-semibold">Password</label>
+        <input v-model="adminLogin.password" type="password" class="mt-2 w-full rounded-2xl border border-[#e8e2de] bg-white px-5 py-4 outline-none transition focus:border-dach-orange" autocomplete="current-password" />
+        <button class="mt-7 block w-full rounded-full bg-dach-orange px-6 py-4 text-center font-semibold text-white transition hover:bg-dach-black" type="submit">
           Sign In <FontAwesomeIcon icon="arrow-right" class="ml-2" />
         </button>
-        <p v-if="loginError" class="mt-4 rounded-2xl bg-dach-orange/15 px-4 py-3 text-sm font-semibold text-white">{{ loginError }}</p>
-        <a href="/" class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-white/60 transition hover:text-white"><FontAwesomeIcon icon="arrow-left" /> Back to website</a>
+        <p v-if="loginError" class="mt-4 rounded-2xl bg-[#fff1eb] px-4 py-3 text-sm font-semibold text-dach-orange">{{ loginError }}</p>
+        <a href="/" class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#7d7773] transition hover:text-dach-black"><FontAwesomeIcon icon="arrow-left" /> Back to website</a>
       </Motion>
     </div>
   </div>
