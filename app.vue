@@ -123,6 +123,13 @@ const bookings = ref<Booking[]>([])
 const messages = ref<AdminMessage[]>([])
 const contentSections = ref<ContentSection[]>([])
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+const siteUrl = 'https://dachremovals.co.uk'
+const landingTitle = 'Dach Removals | UK Removals, Man and Van, House Moves'
+const landingDescription = 'Professional UK removals, man and van services, house moves, office relocations, furniture delivery, packing, and storage support.'
+const adminTitle = computed(() => {
+  if (activeAdminView.value === 'login') return 'Admin Login | Dach Removals'
+  return `${activeAdminView.value.charAt(0).toUpperCase()}${activeAdminView.value.slice(1)} | Dach Removals Admin`
+})
 const activeAdminView = computed(() => {
   if (route.path.includes('/quotes')) return 'quotes'
   if (route.path.includes('/bookings')) return 'bookings'
@@ -131,6 +138,63 @@ const activeAdminView = computed(() => {
   if (route.path.includes('/login')) return 'login'
   return 'dashboard'
 })
+useSeoMeta({
+  title: () => isAdminRoute.value ? adminTitle.value : landingTitle,
+  description: () => isAdminRoute.value ? 'Dach Removals internal administration portal.' : landingDescription,
+  ogTitle: () => isAdminRoute.value ? adminTitle.value : landingTitle,
+  ogDescription: () => isAdminRoute.value ? 'Dach Removals internal administration portal.' : landingDescription,
+  ogImage: () => `${siteUrl}/images/logo.jpg`,
+  ogSiteName: 'Dach Removals',
+  ogType: 'website',
+  ogUrl: () => isAdminRoute.value ? `${siteUrl}${route.path}` : siteUrl,
+  robots: () => isAdminRoute.value ? 'noindex, nofollow' : 'index, follow',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => isAdminRoute.value ? adminTitle.value : landingTitle,
+  twitterDescription: () => isAdminRoute.value ? 'Dach Removals internal administration portal.' : landingDescription,
+  twitterImage: () => `${siteUrl}/images/logo.jpg`,
+})
+useHead(() => ({
+  link: isAdminRoute.value
+    ? [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'manifest', href: '/site.webmanifest' },
+      ]
+    : [
+        { rel: 'canonical', href: siteUrl },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'manifest', href: '/site.webmanifest' },
+      ],
+  meta: [
+    { name: 'theme-color', content: '#ff4f1f' },
+  ],
+  script: isAdminRoute.value
+    ? []
+    : [
+        {
+          type: 'application/ld+json',
+          innerHTML: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'MovingCompany',
+            name: brand.name,
+            url: siteUrl,
+            logo: `${siteUrl}/images/logo.jpg`,
+            image: `${siteUrl}/images/hero-removals.png`,
+            telephone: brand.phone,
+            email: brand.email,
+            areaServed: 'United Kingdom',
+            priceRange: '££',
+            sameAs: [],
+            serviceType: [
+              'Man and van removals',
+              'House removals',
+              'Office relocations',
+              'Furniture delivery',
+              'Packing and storage',
+            ],
+          }),
+        },
+      ],
+}))
 const apiBase = computed(() => config.public.apiBase as string)
 const filteredQuotes = computed(() => {
   const term = quoteSearch.value.trim().toLowerCase()

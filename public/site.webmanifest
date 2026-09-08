@@ -1,0 +1,21 @@
+{
+  "name": "Dach Removals",
+  "short_name": "Dach",
+  "description": "Professional UK removals, man and van, house moves, office relocations, packing, and storage.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff4f1f",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/images/logo.jpg",
+      "sizes": "1600x440",
+      "type": "image/jpeg"
+    }
+  ]
+}
